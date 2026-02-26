@@ -7,11 +7,13 @@
     "build": "next build",
     "start": "next start",
     "deploy": "next start",
+    "init-db": "node scripts/init-db.js",
     "lint": "eslint"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.3.1",
     "jose": "^6.1.3",
     "lucide-react": "^0.561.0",
     "next": "16.0.10",
