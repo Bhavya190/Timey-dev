@@ -106,7 +106,11 @@ export default function AdminEmployees() {
   const handleSaveEmployee = async (empData: any) => {
     try {
       if (modalMode === "add") {
-        const created = await createEmployeeAction(empData);
+        const created: any = await createEmployeeAction(empData);
+        if (created.error) {
+          alert(created.error);
+          return;
+        }
         // Map to summary type for UI
         const summary: Employee = {
           id: created.id,
@@ -141,7 +145,11 @@ export default function AdminEmployees() {
         setEmployees((prev) => [...prev, summary]);
       } else {
         if (!selectedEmployee) return;
-        const updated = await updateEmployeeProfileAction(selectedEmployee.id, empData);
+        const updated: any = await updateEmployeeProfileAction(selectedEmployee.id, empData);
+        if (updated.error) {
+          alert(updated.error);
+          return;
+        }
         const summary: Employee = {
           id: updated.id,
           name: `${updated.firstName} ${updated.lastName}`,
@@ -178,9 +186,9 @@ export default function AdminEmployees() {
       }
       setIsModalOpen(false);
       setSelectedEmployee(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to save employee:", err);
-      alert("Failed to save employee. Please try again.");
+      alert(err.message || "Failed to save employee. Please try again.");
     }
   };
 

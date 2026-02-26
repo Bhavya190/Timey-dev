@@ -77,8 +77,13 @@ export async function createEmployee(data: Omit<Employee, "id">): Promise<Employ
   console.log("SQL QUERY:", queryStr);
   console.log("VALUES:", values);
 
-  const result = await pool.query(queryStr, values);
-  return result.rows[0];
+  try {
+    const result = await pool.query(queryStr, values);
+    return result.rows[0];
+  } catch (err: any) {
+    console.error("PG ERROR:", err);
+    throw new Error(`DB Error: ${err.message}`);
+  }
 }
 
 export async function updateEmployeeProfile(id: number, data: Partial<Employee>): Promise<Employee> {

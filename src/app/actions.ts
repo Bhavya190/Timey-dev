@@ -145,20 +145,36 @@ export async function createEmployeeAction(data: Omit<Employee, "id">) {
         password: hashedPassword
     };
 
-    const created = await createEmployee(employeeWithPassword as any);
-    // Send invitation email
     try {
-        await sendInvitationEmail(created.email, tempPassword, `${created.firstName} ${created.lastName}`);
-    } catch (error) {
-        console.error("Failed to send invitation email:", error);
+        const created = await createEmployee(employeeWithPassword as any);
+        // Send invitation email
+        try {
+            await sendInvitationEmail(created.email, tempPassword, `${created.firstName} ${created.lastName}`);
+        } catch (error) {
+            console.error("Failed to send invitation email:", error);
+        }
+        return created;
+    } catch (err: any) {
+        console.error("createEmployeeAction error:", err);
+        return { error: err.message || "Failed to create employee in database" };
     }
-    return created;
 }
 export async function updateEmployeeProfileAction(id: number, data: Partial<Employee>) {
-    return await updateEmployeeProfile(id, data);
+    try {
+        return await updateEmployeeProfile(id, data);
+    } catch (err: any) {
+        console.error("updateEmployeeProfileAction error:", err);
+        return { error: err.message || "Failed to update employee in database" };
+    }
 }
 export async function deleteEmployeeAction(id: number) {
-    return await deleteEmployee(id);
+    try {
+        await deleteEmployee(id);
+        return { success: true };
+    } catch (err: any) {
+        console.error("deleteEmployeeAction error:", err);
+        return { error: err.message || "Failed to delete employee" };
+    }
 }
 
 // Settings
