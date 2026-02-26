@@ -15,8 +15,8 @@ export async function sendInvitationEmail(email: string, password: string, name:
     const pass = process.env.SMTP_PASS;
 
     if (!user || !pass) {
-        console.warn("SMTP_USER or SMTP_PASS not set. Skipping invitation email.");
-        return;
+        console.warn("SMTP_USER or SMTP_PASS not set in environment variables. Cannot send invitation email.");
+        throw new Error("SMTP credentials are not configured on this server");
     }
 
     const transporter = nodemailer.createTransport({
@@ -50,11 +50,15 @@ export async function sendInvitationEmail(email: string, password: string, name:
     };
 
     try {
+        console.log("Verifying SMTP connection...");
+        await transporter.verify();
+        
+        console.log("SMTP connection successful. Sending email...");
         const info = await transporter.sendMail(mailOptions);
         console.log("Invitation email sent: %s", info.messageId);
         return info;
-    } catch (error) {
-        console.error("Error sending invitation email:", error);
-        throw error;
+    } catch (error: any) {
+        console.error("Error sending invitation email:", error.message || error);
+        throw new Error(`SMTP Error: ${error.message || "Failed to send email"}`);
     }
 }
