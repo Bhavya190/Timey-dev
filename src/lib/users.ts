@@ -69,19 +69,22 @@ export async function getEmployees(): Promise<Employee[]> {
 
 export async function createEmployee(data: Omit<Employee, "id">): Promise<Employee> {
   const fields = Object.keys(data).map(key => `"${key}"`);
-  const values = Object.values(data);
+  // Convert empty strings to null to avoid Postgres type casting errors (e.g. for dates or numbers)
+  const values = Object.values(data).map(v => v === "" ? null : v);
   const placeholders = values.map((_, i) => `$${i + 1}`);
 
-  const result = await pool.query(
-    `INSERT INTO "Employee" (${fields.join(', ')}) VALUES (${placeholders.join(', ')}) RETURNING *`,
-    values
-  );
+  const queryStr = `INSERT INTO "Employee" (${fields.join(', ')}) VALUES (${placeholders.join(', ')}) RETURNING *`;
+  console.log("SQL QUERY:", queryStr);
+  console.log("VALUES:", values);
+
+  const result = await pool.query(queryStr, values);
   return result.rows[0];
 }
 
 export async function updateEmployeeProfile(id: number, data: Partial<Employee>): Promise<Employee> {
   const updates = Object.keys(data).map((key, i) => `"${key}" = $${i + 2}`);
-  const values = [id, ...Object.values(data)];
+  // Convert empty strings to null
+  const values = [id, ...Object.values(data).map(v => v === "" ? null : v)];
 
   const result = await pool.query(
     `UPDATE "Employee" SET ${updates.join(', ')} WHERE id = $1 RETURNING *`,
