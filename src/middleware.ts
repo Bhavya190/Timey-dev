@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
 const secret = new TextEncoder().encode(
-    process.env.JWT_SECRET || "timey-default-secret-do-not-use-in-prod"
+    process.env.JWT_SECRET || "timey-secure-jwt-secret-key-123456"
 );
 
 async function verifyToken(token: string) {

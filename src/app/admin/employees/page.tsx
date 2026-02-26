@@ -111,6 +111,12 @@ export default function AdminEmployees() {
           alert(created.error);
           return;
         }
+        
+        if (!created.emailSent) {
+          alert(`Employee created successfully, but the invitation email failed to send! (Check SMTP settings).\n\nTemporary Password: ${created.tempPassword}\n\nPlease share this password with the employee manually.`);
+        } else {
+          alert(`Employee created successfully! An invitation email with their temporary password has been sent to ${created.email}.`);
+        }
         // Map to summary type for UI
         const summary: Employee = {
           id: created.id,

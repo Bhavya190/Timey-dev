@@ -1,7 +1,9 @@
 import { SignJWT, jwtVerify } from "jose";
 
+// Ensure a strong fallback that matches the local development .env so that
+// Edge Middleware and Node Server Actions do not end up with mismatched secrets
 const secret = new TextEncoder().encode(
-    process.env.JWT_SECRET || "timey-default-secret-do-not-use-in-prod"
+    process.env.JWT_SECRET || "timey-secure-jwt-secret-key-123456"
 );
 
 export type JWTPayload = {
