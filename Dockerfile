@@ -27,8 +27,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
 
-
-USER nextjs
+# Copy production dependencies for scripts
+COPY --from=deps /app/node_modules ./node_modulesUSER nextjs
 EXPOSE 10000
 ENV HOSTNAME="0.0.0.0"
 
