@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: timey-postgres-test
+    restart: always
+    environment:
+      POSTGRES_USER: timey_user_test
+      POSTGRES_PASSWORD: timey_pass_test
+      POSTGRES_DB: timey_db_test
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata_test:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: timey-app-test
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=postgresql://timey_user_test:timey_pass_test@db:5432/timey_db_test?schema=public
+      - NEXTAUTH_SECRET=your_secret_here
+      - NEXTAUTH_URL=http://localhost:3001
+    depends_on:
+      - db
+
+volumes:
+  pgdata_test:

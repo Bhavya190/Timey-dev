@@ -1,0 +1,110 @@
+﻿node.exe : [baseline-b
+rowser-mapping] The 
+data in this module 
+is over two months 
+old.  To ensure 
+accurate Baseline 
+data, please update: 
+`npm i baseline-browse
+r-mapping@latest -D`
+At line:1 char:1
++ & "C:\Program Files\
+nodejs/node.exe" "C:\U
+sers\ADMIN\AppData\Roa
+ming\ ...
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: ([baseline-   
+ brows...ping@late    
+st -D`:String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+   Ôû▓ Next.js 16.0.10 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+[baseline-browser-mapp
+ing] The data in this 
+module is over two 
+months old.  To 
+ensure accurate 
+Baseline data, please 
+update: `npm i baselin
+e-browser-mapping@late
+st -D`
+ Ô£ô Compiled successfully in 19.0s
+   Running TypeScript ...
+Failed to compile.
+
+./src/app/actions.ts:1
+05:33
+Type error: Argument 
+of type 'Omit<Employee
+Profile, "id">' is 
+not assignable to 
+parameter of type 
+'Omit<Employee, 
+"id">'.
+  Types of property 
+'billingEnd' are 
+incompatible.
+    Type 'string | 
+undefined' is not 
+assignable to type 
+'string'.
+      Type 
+'undefined' is not 
+assignable to type 
+'string'.
+
+[0m [90m 103 |[39m 
+[90m// Mutations - 
+Employees[39m
+ [90m 104 |[39m 
+[36mexport[39m 
+[36masync[39m 
+[36mfunction[39m cre
+ateEmployeeAction(data
+[33m:[39m [33mOmit
+[39m[33m<[39m[33mEm
+ployeeProfile[39m[33
+m,[39m [32m"id"[39m
+[33m>[39m) {
+[31m[1m>[22m[39m[
+90m 105 |[39m     
+[36mreturn[39m 
+[36mawait[39m create
+Employee(data)[33m;[
+39m
+ [90m     |[39m     
+                      
+      
+[31m[1m^[22m[39m
+ [90m 106 |[39m }
+ [90m 107 |[39m 
+[36mexport[39m 
+[36masync[39m 
+[36mfunction[39m upd
+ateEmployeeProfileActi
+on(id[33m:[39m 
+number[33m,[39m 
+data[33m:[39m [33mP
+artial[39m[33m<[39m
+[33mEmployeeProfile[
+39m[33m>[39m) {
+ [90m 108 |[39m     
+[36mreturn[39m 
+[36mawait[39m update
+EmployeeProfile(id[33
+m,[39m 
+data)[33m;[39m[0m
+Next.js build worker 
+exited with code: 1 
+and signal: null
