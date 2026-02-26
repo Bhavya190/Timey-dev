@@ -58,13 +58,18 @@ export default function AdminClients() {
   };
 
   const handleRemove = async (id: number) => {
+    if (!confirm("Are you sure you want to remove this client?")) return;
     try {
-      await deleteClientAction(id);
+      const res: any = await deleteClientAction(id);
+      if (res?.error) {
+        alert(res.error);
+        return;
+      }
       setClients((prev) => prev.filter((c) => c.id !== id));
       setOpenMenuId(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to delete client:", err);
-      alert("Failed to delete client. Please try again.");
+      alert(err.message || "Failed to delete client. Please try again.");
     }
   };
 

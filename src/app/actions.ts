@@ -100,7 +100,13 @@ export async function updateClientAction(id: number, data: Partial<Client>) {
     }
 }
 export async function deleteClientAction(id: number) {
-    return await deleteClient(id);
+    try {
+        await deleteClient(id);
+        return { success: true };
+    } catch (err: any) {
+        console.error("deleteClientAction error:", err);
+        return { error: err.message || "Failed to delete client in database" };
+    }
 }
 
 // Mutations - Projects

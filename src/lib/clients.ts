@@ -108,7 +108,14 @@ export async function updateClient(id: number, data: Partial<Client>): Promise<C
 }
 
 export async function deleteClient(id: number): Promise<void> {
-  await pool.query('DELETE FROM "Client" WHERE "id" = $1', [id]);
+  try {
+    await pool.query('DELETE FROM "Client" WHERE "id" = $1', [id]);
+  } catch (err: any) {
+    if (err.code === '23503') {
+      throw new Error(`Cannot delete this client because they are currently assigned to one or more projects. Please delete or reassign those projects first.`);
+    }
+    throw new Error(`DB Error: ${err.message}`);
+  }
 }
 
 // initialClients export removed, use fetchClientsAction instead
