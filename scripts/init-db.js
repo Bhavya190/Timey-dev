@@ -24,7 +24,22 @@ async function main() {
         `);
 
         if (checkTable.rows[0].exists) {
-            console.log("Database tables already exist. Skipping initialization.");
+            console.log("Database tables already exist. Running schema migration for missing columns...");
+            const missingColumns = [
+                `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "middleName" TEXT;`,
+                `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "terminationDate" TEXT;`,
+                `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "emailNotifications" BOOLEAN DEFAULT false;`,
+                `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "weeklyReport" BOOLEAN DEFAULT false;`,
+                `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "securityAlerts" BOOLEAN DEFAULT false;`
+            ];
+            for (const migration of missingColumns) {
+                try {
+                    await pool.query(migration);
+                } catch (err) {
+                    console.log("Migration error:", err.message);
+                }
+            }
+            console.log("Schema migration complete. Skipping full initialization.");
             return;
         }
 
