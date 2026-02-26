@@ -1,4 +1,8 @@
-require('dotenv').config();
+try {
+    require('dotenv').config();
+} catch (e) {
+    // Ignore error if dotenv is not present (e.g. in production)
+}
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 
