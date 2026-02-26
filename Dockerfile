@@ -28,7 +28,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
 
 # Copy production dependencies for scripts
-COPY --from=deps /app/node_modules ./node_modulesUSER nextjs
+COPY --from=deps /app/node_modules ./node_modules
+USER nextjs
 EXPOSE 10000
 ENV HOSTNAME="0.0.0.0"
 
