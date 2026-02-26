@@ -381,7 +381,12 @@ export default function ProjectModal({
   const handleSaveNewClient = async (newClient: Client) => {
     try {
       // 1. Actually save the client to DB
-      const saved = await createClientAction(newClient);
+      const saved: any = await createClientAction(newClient);
+
+      if (saved.error) {
+        alert(saved.error);
+        return;
+      }
 
       // 2. Refresh client list
       const updatedClients = await refreshClients();
