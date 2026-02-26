@@ -10,16 +10,19 @@ async function main() {
     console.log('Starting raw DB initialization...');
 
     try {
-        console.log('Dropping existing tables...');
-        await pool.query(`
-      DROP TABLE IF EXISTS "Timesheet" CASCADE;
-      DROP TABLE IF EXISTS "_AssigneeTasks" CASCADE;
-      DROP TABLE IF EXISTS "Task" CASCADE;
-      DROP TABLE IF EXISTS "_TeamMembers" CASCADE;
-      DROP TABLE IF EXISTS "Project" CASCADE;
-      DROP TABLE IF EXISTS "Client" CASCADE;
-      DROP TABLE IF EXISTS "Employee" CASCADE;
-    `);
+        // Check if database is already initialized
+        const checkTable = await pool.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name = 'Employee'
+            );
+        `);
+
+        if (checkTable.rows[0].exists) {
+            console.log("Database tables already exist. Skipping initialization.");
+            return;
+        }
 
         console.log('Creating tables...');
 
