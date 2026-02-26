@@ -9,8 +9,6 @@ RUN npm ci
 FROM node:20-bookworm-slim AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY prisma ./prisma/
-RUN npx prisma generate
 COPY . .
 RUN npm run build
 
@@ -28,15 +26,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# Copy Prisma CLI + client (ALL three needed!)
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/prisma ./prisma
+
 
 USER nextjs
 EXPOSE 10000
 ENV HOSTNAME="0.0.0.0"
 
-# Use node directly (more reliable than npx in standalone)
-CMD ["/bin/sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node server.js"]
+# Use node directly
+CMD ["node", "server.js"]
