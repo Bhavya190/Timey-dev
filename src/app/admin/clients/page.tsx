@@ -90,20 +90,28 @@ export default function AdminClients() {
     try {
       if (modalMode === "add") {
         const { id, ...data } = client;
-        const created = await createClientAction(data);
+        const created: any = await createClientAction(data);
+        if (created.error) {
+          alert(created.error);
+          return;
+        }
         setClients((prev) => [...prev, created]);
       } else {
         const { id, ...data } = client;
-        const updated = await updateClientAction(id, data);
+        const updated: any = await updateClientAction(id, data);
+        if (updated.error) {
+          alert(updated.error);
+          return;
+        }
         setClients((prev) =>
           prev.map((c) => (c.id === id ? updated : c))
         );
       }
       setIsModalOpen(false);
       setSelectedClient(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to save client:", err);
-      alert("Failed to save client. Please try again.");
+      alert(err.message || "Failed to save client. Please try again.");
     }
   };
 

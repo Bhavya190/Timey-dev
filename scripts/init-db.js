@@ -30,7 +30,14 @@ async function main() {
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "terminationDate" TEXT;`,
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "emailNotifications" BOOLEAN DEFAULT false;`,
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "weeklyReport" BOOLEAN DEFAULT false;`,
-                `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "securityAlerts" BOOLEAN DEFAULT false;`
+                `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "securityAlerts" BOOLEAN DEFAULT false;`,
+                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "address" TEXT;`,
+                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "city" TEXT;`,
+                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "stateRegion" TEXT;`,
+                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "zip" TEXT;`,
+                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "contactNumber" TEXT;`,
+                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "defaultRate" TEXT;`,
+                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "fixedBidMode" BOOLEAN DEFAULT false;`
             ];
             for (const migration of missingColumns) {
                 try {
@@ -87,6 +94,13 @@ async function main() {
           "nickname" TEXT,
           "email" TEXT,
           "country" TEXT,
+          "address" TEXT,
+          "city" TEXT,
+          "stateRegion" TEXT,
+          "zip" TEXT,
+          "contactNumber" TEXT,
+          "defaultRate" TEXT,
+          "fixedBidMode" BOOLEAN DEFAULT false,
           "status" TEXT NOT NULL DEFAULT 'Active',
           "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
           "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

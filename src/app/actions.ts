@@ -84,10 +84,20 @@ export async function fetchEmployeeAction(id: number): Promise<Employee | null> 
 
 // Mutations - Clients
 export async function createClientAction(data: Omit<Client, "id">) {
-    return await createClient(data);
+    try {
+        return await createClient(data);
+    } catch (err: any) {
+        console.error("createClientAction error:", err);
+        return { error: err.message || "Failed to create client in database" };
+    }
 }
 export async function updateClientAction(id: number, data: Partial<Client>) {
-    return await updateClient(id, data);
+    try {
+        return await updateClient(id, data);
+    } catch (err: any) {
+        console.error("updateClientAction error:", err);
+        return { error: err.message || "Failed to update client in database" };
+    }
 }
 export async function deleteClientAction(id: number) {
     return await deleteClient(id);
