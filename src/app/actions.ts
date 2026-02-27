@@ -1,6 +1,7 @@
 "use server"
 
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { signToken, verifyToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
@@ -174,6 +175,9 @@ export async function createEmployeeAction(data: Omit<Employee, "id">) {
             console.error("Failed to send invitation email:", error);
             emailErrorMsg = error.message || String(error);
         }
+        
+        revalidatePath("/admin", "layout");
+        
         return { ...created, tempPassword, emailSent, emailErrorMsg };
     } catch (err: any) {
         console.error("createEmployeeAction error:", err);
@@ -182,7 +186,9 @@ export async function createEmployeeAction(data: Omit<Employee, "id">) {
 }
 export async function updateEmployeeProfileAction(id: number, data: Partial<Employee>) {
     try {
-        return await updateEmployeeProfile(id, data);
+        const updated = await updateEmployeeProfile(id, data as any);
+        revalidatePath("/admin", "layout");
+        return updated;
     } catch (err: any) {
         console.error("updateEmployeeProfileAction error:", err);
         return { error: err.message || "Failed to update employee in database" };
@@ -191,6 +197,7 @@ export async function updateEmployeeProfileAction(id: number, data: Partial<Empl
 export async function deleteEmployeeAction(id: number) {
     try {
         await deleteEmployee(id);
+        revalidatePath("/admin", "layout");
         return { success: true };
     } catch (err: any) {
         console.error("deleteEmployeeAction error:", err);
