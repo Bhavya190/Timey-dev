@@ -301,7 +301,7 @@ export default function ProjectDetailPage() {
               No tasks have been added for this project yet.
             </p>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto pb-[150px] min-h-[300px]">
               <table className="min-w-full text-left text-xs sm:text-sm">
                 <thead className="bg-background/80 text-muted border-b border-border">
                   <tr>
