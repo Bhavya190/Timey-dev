@@ -118,38 +118,43 @@ export default function AdminEmployees() {
         } else {
           alert(`Employee created successfully! An invitation email with their temporary password has been sent to ${created.email}.`);
         }
-        // Map to summary type for UI (handling both camelCase and snake_case API returns)
-        const summary: Employee = {
-          id: created.id,
-          name: `${created.firstName || created.first_name} ${created.lastName || created.last_name}`,
-          firstName: created.firstName || created.first_name || "",
-          middleName: created.middleName || created.middle_name || undefined,
-          lastName: created.lastName || created.last_name || "",
-          email: created.email || "",
-          department: created.department || "",
-          location: created.location || "",
-          code: created.code || "",
-          status: "Active",
-          role: created.role || "Employee",
-          shift: created.shift || "",
-          address: created.address,
-          city: created.city,
-          stateRegion: created.stateRegion || created.state_region,
-          country: created.country,
-          zip: created.zip,
-          phone: created.phone,
-          hireDate: created.hireDate || created.hire_date ? new Date(created.hireDate || created.hire_date).toISOString().split('T')[0] : "",
-          terminationDate: created.terminationDate || created.termination_date ? new Date(created.terminationDate || created.termination_date).toISOString().split('T')[0] : undefined,
-          workType: created.workType || created.work_type,
-          billingType: created.billingType || created.billing_type,
-          employeeRate: created.employeeRate || created.employee_rate,
-          employeeCurrency: created.employeeCurrency || created.employee_currency,
-          billingRateType: created.billingRateType || created.billing_rate_type,
-          billingCurrency: created.billingCurrency || created.billing_currency,
-          billingStart: created.billingStart || created.billing_start ? new Date(created.billingStart || created.billing_start).toISOString().split('T')[0] : "",
-          billingEnd: created.billingEnd || created.billing_end ? new Date(created.billingEnd || created.billing_end).toISOString().split('T')[0] : undefined,
-        };
-        setEmployees((prev) => [...prev, summary]);
+        // Try mapping the created employee safely. If it fails, close modal and tell user to refresh.
+        try {
+          const summary: Employee = {
+            id: created.id,
+            name: `${created.firstName || created.first_name || ""} ${created.lastName || created.last_name || ""}`.trim() || "New Employee",
+            firstName: created.firstName || created.first_name || "",
+            middleName: created.middleName || created.middle_name || "",
+            lastName: created.lastName || created.last_name || "",
+            email: created.email || "",
+            department: created.department || "",
+            location: created.location || "",
+            code: created.code || "",
+            status: "Active",
+            role: created.role || "Employee",
+            shift: created.shift || "",
+            address: created.address,
+            city: created.city,
+            stateRegion: created.stateRegion || created.state_region,
+            country: created.country,
+            zip: created.zip,
+            phone: created.phone,
+            hireDate: created.hireDate || created.hire_date ? new Date(created.hireDate || created.hire_date).toISOString().split('T')[0] : "",
+            terminationDate: created.terminationDate || created.termination_date ? new Date(created.terminationDate || created.termination_date).toISOString().split('T')[0] : "",
+            workType: created.workType || created.work_type || "",
+            billingType: created.billingType || created.billing_type || "",
+            employeeRate: created.employeeRate || created.employee_rate ? String(created.employeeRate || created.employee_rate) : "",
+            employeeCurrency: created.employeeCurrency || created.employee_currency || "",
+            billingRateType: created.billingRateType || created.billing_rate_type || "",
+            billingCurrency: created.billingCurrency || created.billing_currency || "",
+            billingStart: created.billingStart || created.billing_start ? new Date(created.billingStart || created.billing_start).toISOString().split('T')[0] : "",
+            billingEnd: created.billingEnd || created.billing_end ? new Date(created.billingEnd || created.billing_end).toISOString().split('T')[0] : "",
+          };
+          setEmployees((prev) => [...prev, summary]);
+        } catch (mappingErr) {
+          console.error("Error mapping created employee to UI:", mappingErr, "Raw API Return:", created);
+          alert("Employee created and email result shown! Please refresh the page to see them in the list.");
+        }
       } else {
         if (!selectedEmployee) return;
         const updated: any = await updateEmployeeProfileAction(selectedEmployee.id, empData);
