@@ -164,14 +164,17 @@ export async function createEmployeeAction(data: Omit<Employee, "id">) {
     try {
         const created = await createEmployee(employeeWithPassword as any);
         let emailSent = false;
+        let emailErrorMsg = "";
         // Send invitation email
         try {
-            await sendInvitationEmail(created.email, tempPassword, `${created.firstName} ${created.lastName}`);
+            const rawCreated: any = created;
+            await sendInvitationEmail(created.email, tempPassword, `${rawCreated.firstName || rawCreated.first_name} ${rawCreated.lastName || rawCreated.last_name}`);
             emailSent = true;
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to send invitation email:", error);
+            emailErrorMsg = error.message || String(error);
         }
-        return { ...created, tempPassword, emailSent };
+        return { ...created, tempPassword, emailSent, emailErrorMsg };
     } catch (err: any) {
         console.error("createEmployeeAction error:", err);
         return { error: err.message || "Failed to create employee in database" };
