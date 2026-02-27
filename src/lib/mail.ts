@@ -9,7 +9,8 @@ import nodemailer from "nodemailer";
  */
 export async function sendInvitationEmail(email: string, password: string, name: string) {
     const host = process.env.EMAIL_HOST || "sandbox.smtp.mailtrap.io";
-    const port = Number(process.env.EMAIL_PORT) || 2525;
+    const port = Number(process.env.EMAIL_PORT) || 587;
+    const secure = process.env.EMAIL_SECURE === "true"; // Parse boolean
     const user = process.env.EMAIL_USER;
     const pass = process.env.EMAIL_PASSWORD;
     const fromAddress = process.env.EMAIL_FROM_ADDRESS || "admin@timey.com";
@@ -20,10 +21,11 @@ export async function sendInvitationEmail(email: string, password: string, name:
         throw new Error("Mail credentials are not configured on this server");
     }
 
-    // Configured for generic SMTP or Mailtrap
+    // Configured for generic SMTP
     const transporter = nodemailer.createTransport({
         host,
         port,
+        secure, // false for 587, true for 465
         auth: {
             user,
             pass
@@ -46,7 +48,7 @@ export async function sendInvitationEmail(email: string, password: string, name:
     `;
 
     try {
-        console.log("Sending email via Mailtrap...");
+        console.log(`Sending email via ${host}...`);
         const info = await transporter.sendMail({
             from: `"${fromName}" <${fromAddress}>`,
             to: email,
@@ -54,10 +56,10 @@ export async function sendInvitationEmail(email: string, password: string, name:
             html: htmlContent,
         });
 
-        console.log("Invitation email sent successfully to Mailtrap: %s", info.messageId);
+        console.log("Invitation email sent successfully: %s", info.messageId);
         return info;
     } catch (error: any) {
-        console.error("Error sending invitation email via Mailtrap:", error.message || error);
-        throw new Error(`Mailtrap Error: ${error.message || "Failed to send email"}`);
+        console.error("Error sending invitation email:", error.message || error);
+        throw new Error(`SMTP Error: ${error.message || "Failed to send email"}`);
     }
 }
