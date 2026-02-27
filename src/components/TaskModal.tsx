@@ -244,6 +244,10 @@ export default function TaskModal({
       paddingTop: 4,
       paddingBottom: 4,
     }),
+    menuPortal: (base: any) => ({
+      ...base,
+      zIndex: 9999,
+    }),
     option: (base: any, state: any) => ({
       ...base,
       fontSize: "0.875rem",
@@ -269,7 +273,7 @@ export default function TaskModal({
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
-      <div className="relative w-full max-w-2xl rounded-2xl bg-card text-foreground shadow-2xl border border-border max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-2xl rounded-2xl bg-card text-foreground shadow-2xl border border-border max-h-[90vh] overflow-visible flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-lg font-semibold">
@@ -498,6 +502,9 @@ export default function TaskModal({
                 styles={customSelectStyles}
                 isClearable={false}
                 components={{ ClearIndicator: () => null }}
+                menuPlacement="auto"
+                menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                menuPosition="fixed"
               />
             </div>
           )}

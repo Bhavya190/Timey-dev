@@ -545,7 +545,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
       </section>
 
       {/* Weekly grid with header toolbar (Add row + Submit week) */}
-      <section className="rounded-2xl border border-border bg-card overflow-hidden">
+      <section className="rounded-2xl border border-border bg-card overflow-visible">
         <div className="border-b border-border px-4 py-2 bg-background/60 flex justify-between items-center">
           <span className="text-xs text-muted">
             Manage your timesheet rows for this week.
@@ -580,7 +580,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
           </div>
         </div>
 
-        <div className="overflow-x-auto pb-[150px] min-h-[300px]">
+        <div className="overflow-x-auto">
           <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-background/80 text-muted border-b border-border">
               <tr>

@@ -490,7 +490,7 @@ export default function AdminTasks() {
       </div>
 
       {/* Container */}
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <div className="rounded-2xl border border-border bg-card overflow-visible">
         {/* Toolbar (count + search + toggle) */}
         <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-xs text-muted">
@@ -546,7 +546,7 @@ export default function AdminTasks() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto pb-32 min-h-[300px]">
+        <div className="overflow-x-auto">
           <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-background/80 text-muted border-b border-border">
               <tr>
