@@ -33,7 +33,7 @@ export default function ProjectDetailPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [viewMode, setViewMode] = useState<"logs" | "summary">("logs");
+  const [viewMode, setViewMode] = useState<"logs" | "summary">("summary");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({ key: "name", direction: "asc" });
   const [isLoading, setIsLoading] = useState(true);
 

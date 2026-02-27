@@ -135,7 +135,7 @@ export default function EmployeeTasksPage({ currentEmployeeId: propId }: { curre
     );
   }, [employeeInitialTasks, dateRange]);
 
-  const [viewMode, setViewMode] = useState<"logs" | "summary">("logs");
+  const [viewMode, setViewMode] = useState<"logs" | "summary">("summary");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({ key: "date", direction: "desc" });
   const [openMenuId, setOpenMenuId] = useState<number | string | null>(null);
 

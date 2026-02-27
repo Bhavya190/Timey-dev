@@ -143,7 +143,7 @@ export default function AdminTasks() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState<"logs" | "summary">("logs");
+  const [viewMode, setViewMode] = useState<"logs" | "summary">("summary");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({ key: "date", direction: "desc" });
 
   // --- Weekly date range state (header) ---

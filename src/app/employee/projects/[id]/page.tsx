@@ -38,7 +38,7 @@ export default function EmployeeProjectDetailsPage({ params, currentEmployeeId: 
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [viewMode, setViewMode] = useState<"logs" | "summary">("logs");
+  const [viewMode, setViewMode] = useState<"logs" | "summary">("summary");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({ key: "date", direction: "desc" });
   const [isLoading, setIsLoading] = useState(true);
 
