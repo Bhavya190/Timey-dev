@@ -41,6 +41,11 @@ export async function sendInvitationEmail(email: string, password: string, name:
             html: htmlContent,
         });
         
+        if (data.error) {
+            console.error("Resend API returned an error:", data.error);
+            throw new Error(`Resend Error: ${data.error.message}`);
+        }
+
         console.log("Invitation email sent successfully:", data);
         return data;
     } catch (error: any) {
