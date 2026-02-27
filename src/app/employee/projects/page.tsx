@@ -300,7 +300,7 @@ export default function EmployeeProjectsPage({ currentEmployeeId: propId }: { cu
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card overflow-visible">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         {/* Top bar with count + icon */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3 text-xs text-muted">
           <div className="flex items-center gap-2">

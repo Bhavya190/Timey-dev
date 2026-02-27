@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Client } from "@/lib/clients";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/app/actions";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import ClientModal from "@/components/ClientModal";
+import ActionMenu from "@/components/ActionMenu";
 
 function StatusBadge({ status }: { status: Client["status"] }) {
   const isActive = status === "Active";
@@ -32,6 +33,7 @@ export default function AdminClients() {
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const actionButtonRefs = useRef<{ [key: number]: HTMLButtonElement | null }>({});
 
   useEffect(() => {
     fetchClientsAction().then((data) => {
@@ -186,7 +188,7 @@ export default function AdminClients() {
       </div>
 
       {/* Container */}
-      <div className="rounded-2xl border border-border bg-card overflow-visible">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         {/* Toolbar */}
         <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-xs text-muted">
@@ -289,34 +291,39 @@ export default function AdminClients() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
+                      ref={(el) => {
+                        actionButtonRefs.current[client.id] = el;
+                      }}
                       onClick={() => toggleMenu(client.id)}
                       className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-card"
                     >
                       ⋮
                     </button>
 
-                    {openMenuId === client.id && (
-                      <div className="absolute right-4 top-11 z-10 w-40 rounded-lg border border-border bg-card text-xs shadow-lg">
-                        <button
-                          onClick={() => handleView(client)}
-                          className="block w-full px-3 py-2 text-left hover:bg-background/70"
-                        >
-                          View details
-                        </button>
-                        <button
-                          onClick={() => handleEdit(client)}
-                          className="block w-full px-3 py-2 text-left hover:bg-background/70"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleRemove(client.id)}
-                          className="block w-full px-3 py-2 text-left text-red-500 hover:bg-red-500/10"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    )}
+                    <ActionMenu
+                      isOpen={openMenuId === client.id}
+                      onClose={() => setOpenMenuId(null)}
+                      triggerRef={{ current: actionButtonRefs.current[client.id] ?? null }}
+                    >
+                      <button
+                        onClick={() => handleView(client)}
+                        className="block w-full px-3 py-2 text-left hover:bg-background/70"
+                      >
+                        View details
+                      </button>
+                      <button
+                        onClick={() => handleEdit(client)}
+                        className="block w-full px-3 py-2 text-left hover:bg-background/70"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleRemove(client.id)}
+                        className="block w-full px-3 py-2 text-left text-red-500 hover:bg-red-500/10"
+                      >
+                        Remove
+                      </button>
+                    </ActionMenu>
                   </td>
                 </tr>
               ))}

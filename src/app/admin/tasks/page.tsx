@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Task,
@@ -18,6 +18,7 @@ import {
   deleteTaskAction,
 } from "@/app/actions";
 import TaskModal from "@/components/TaskModal";
+import ActionMenu from "@/components/ActionMenu";
 import {
   ChevronLeft,
   ChevronRight,
@@ -138,6 +139,7 @@ export default function AdminTasks() {
   const hasProjects = projects.length > 0;
   const employeesById = useMemo(() => getEmployeesById(users), [users]);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const actionButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -490,7 +492,7 @@ export default function AdminTasks() {
       </div>
 
       {/* Container */}
-      <div className="rounded-2xl border border-border bg-card overflow-visible">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         {/* Toolbar (count + search + toggle) */}
         <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-xs text-muted">
@@ -681,41 +683,46 @@ export default function AdminTasks() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
+                        ref={(el) => {
+                          actionButtonRefs.current[`${task.projectId}-${task.name}`] = el;
+                        }}
                         onClick={() => setOpenMenuId(openMenuId === (`${task.projectId}-${task.name}` as any) ? null : (`${task.projectId}-${task.name}` as any))}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-card"
                       >
                         <MoreVertical className="h-4 w-4" />
                       </button>
 
-                      {openMenuId === (`${task.projectId}-${task.name}` as any) && (
-                        <div className="absolute right-4 top-11 z-10 w-44 rounded-lg border border-border bg-card text-xs shadow-lg text-left overflow-hidden">
-                          <button
-                            onClick={() => handleView(task)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-background/70"
-                          >
-                            <Eye className="h-4 w-4 text-muted" />
-                            <span>View project</span>
-                          </button>
-                          <button
-                            onClick={() => handleEdit(task)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-background/70"
-                          >
-                            <Pencil className="h-4 w-4 text-muted" />
-                            <span>Edit task</span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (confirm("Are you sure you want to remove this task and all its entries for this week?")) {
-                                handleRemoveGroup(task.projectId, task.name);
-                              }
-                            }}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-left text-red-500 hover:bg-red-500/10"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            <span>Remove task</span>
-                          </button>
-                        </div>
-                      )}
+                      <ActionMenu
+                        isOpen={openMenuId === (`${task.projectId}-${task.name}` as any)}
+                        onClose={() => setOpenMenuId(null)}
+                        triggerRef={{ current: actionButtonRefs.current[`${task.projectId}-${task.name}`] ?? null }}
+                      >
+                        <button
+                          onClick={() => handleView(task)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-background/70"
+                        >
+                          <Eye className="h-4 w-4 text-muted" />
+                          <span>View project</span>
+                        </button>
+                        <button
+                          onClick={() => handleEdit(task)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-background/70"
+                        >
+                          <Pencil className="h-4 w-4 text-muted" />
+                          <span>Edit task</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm("Are you sure you want to remove this task and all its entries for this week?")) {
+                              handleRemoveGroup(task.projectId, task.name);
+                            }
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-left text-red-500 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span>Remove task</span>
+                        </button>
+                      </ActionMenu>
                     </td>
                   </tr>
                 ))

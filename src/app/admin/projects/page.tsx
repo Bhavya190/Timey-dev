@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Project, ProjectStatus } from "@/lib/projects";
 import {
@@ -10,6 +10,7 @@ import {
   deleteProjectAction,
 } from "@/app/actions";
 import ProjectModal from "@/components/ProjectModal";
+import ActionMenu from "@/components/ActionMenu";
 import { ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, FileDown } from "lucide-react";
 
 function StatusBadge({ status }: { status: ProjectStatus }) {
@@ -75,6 +76,7 @@ export default function AdminProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const actionButtonRefs = useRef<{ [key: number]: HTMLButtonElement | null }>({});
 
   useEffect(() => {
     fetchProjectsAction().then((data) => {
@@ -349,7 +351,7 @@ export default function AdminProjects() {
       </div>
 
       {/* Container */}
-      <div className="rounded-2xl border border-border bg-card overflow-visible">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         {/* Toolbar */}
         <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-xs text-muted">
@@ -479,34 +481,39 @@ export default function AdminProjects() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
+                        ref={(el) => {
+                          actionButtonRefs.current[project.id] = el;
+                        }}
                         onClick={() => toggleMenu(project.id)}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-card"
                       >
                         ⋮
                       </button>
 
-                      {openMenuId === project.id && (
-                        <div className="absolute right-4 top-11 z-10 w-40 rounded-lg border border-border bg-card text-xs shadow-lg">
-                          <button
-                            onClick={() => handleView(project)}
-                            className="block w-full px-3 py-2 text-left hover:bg-background/70"
-                          >
-                            View details
-                          </button>
-                          <button
-                            onClick={() => handleEdit(project)}
-                            className="block w-full px-3 py-2 text-left hover:bg-background/70"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleRemove(project.id)}
-                            className="block w-full px-3 py-2 text-left text-red-500 hover:bg-red-500/10"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      )}
+                      <ActionMenu
+                        isOpen={openMenuId === project.id}
+                        onClose={() => setOpenMenuId(null)}
+                        triggerRef={{ current: actionButtonRefs.current[project.id] ?? null }}
+                      >
+                        <button
+                          onClick={() => handleView(project)}
+                          className="block w-full px-3 py-2 text-left hover:bg-background/70"
+                        >
+                          View details
+                        </button>
+                        <button
+                          onClick={() => handleEdit(project)}
+                          className="block w-full px-3 py-2 text-left hover:bg-background/70"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleRemove(project.id)}
+                          className="block w-full px-3 py-2 text-left text-red-500 hover:bg-red-500/10"
+                        >
+                          Remove
+                        </button>
+                      </ActionMenu>
                     </td>
                   </tr>
                 ))

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Employee } from "@/lib/employees";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/app/actions";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import AddEmployeeModal from "@/components/AddEmployeeModal";
+import ActionMenu from "@/components/ActionMenu";
 
 function AvatarCircle({ name }: { name: string }) {
   const initials = name
@@ -47,6 +48,7 @@ export default function AdminEmployees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const actionButtonRefs = useRef<{ [key: number]: HTMLButtonElement | null }>({});
 
   useEffect(() => {
     fetchAdminEmployeesAction().then((data) => {
@@ -289,7 +291,7 @@ export default function AdminEmployees() {
       </div>
 
       {/* Container */}
-      <div className="rounded-2xl border border-border bg-card overflow-visible">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         {/* Toolbar */}
         <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-xs text-muted">
@@ -413,34 +415,39 @@ export default function AdminEmployees() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
+                      ref={(el) => {
+                        actionButtonRefs.current[emp.id] = el;
+                      }}
                       onClick={() => toggleMenu(emp.id)}
                       className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-card"
                     >
                       ⋮
                     </button>
 
-                    {openMenuId === emp.id && (
-                      <div className="absolute right-4 top-11 z-10 w-40 rounded-lg border border-border bg-card text-xs shadow-lg">
-                        <button
-                          onClick={() => handleView(emp)}
-                          className="block w-full px-3 py-2 text-left hover:bg-background/70"
-                        >
-                          View details
-                        </button>
-                        <button
-                          onClick={() => handleEdit(emp)}
-                          className="block w-full px-3 py-2 text-left hover:bg-background/70"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleRemove(emp.id)}
-                          className="block w-full px-3 py-2 text-left text-red-500 hover:bg-red-500/10"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    )}
+                    <ActionMenu
+                      isOpen={openMenuId === emp.id}
+                      onClose={() => setOpenMenuId(null)}
+                      triggerRef={{ current: actionButtonRefs.current[emp.id] ?? null }}
+                    >
+                      <button
+                        onClick={() => handleView(emp)}
+                        className="block w-full px-3 py-2 text-left hover:bg-background/70"
+                      >
+                        View details
+                      </button>
+                      <button
+                        onClick={() => handleEdit(emp)}
+                        className="block w-full px-3 py-2 text-left hover:bg-background/70"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleRemove(emp.id)}
+                        className="block w-full px-3 py-2 text-left text-red-500 hover:bg-red-500/10"
+                      >
+                        Remove
+                      </button>
+                    </ActionMenu>
                   </td>
                 </tr>
               ))}

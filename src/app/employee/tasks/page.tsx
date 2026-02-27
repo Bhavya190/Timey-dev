@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, FormEvent } from "react";
+import { useEffect, useMemo, useState, FormEvent, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   type Task,
@@ -10,6 +10,7 @@ import {
   getCurrentUserAction,
 } from "@/app/actions";
 import type { TaskStatus } from "@/types";
+import ActionMenu from "@/components/ActionMenu";
 import {
   MoreVertical,
   Eye,
@@ -138,6 +139,7 @@ export default function EmployeeTasksPage({ currentEmployeeId: propId }: { curre
   const [viewMode, setViewMode] = useState<"logs" | "summary">("summary");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({ key: "date", direction: "desc" });
   const [openMenuId, setOpenMenuId] = useState<number | string | null>(null);
+  const actionButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -504,7 +506,7 @@ export default function EmployeeTasksPage({ currentEmployeeId: propId }: { curre
       {/* Table wrapper */}
 
       {/* Table wrapper */}
-      <div className="rounded-2xl border border-border bg-card overflow-visible">
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-background/80 text-muted border-b border-border">
@@ -596,49 +598,54 @@ export default function EmployeeTasksPage({ currentEmployeeId: propId }: { curre
                         onClick={(e) => e.stopPropagation()}
                       >
                         <button
-                          onClick={() => setOpenMenuId(openMenuId === (groupKey as any) ? null : (groupKey as any))}
+                          ref={(el) => {
+                            actionButtonRefs.current[groupKey] = el;
+                          }}
+                          onClick={() => setOpenMenuId(openMenuId === groupKey ? null : groupKey)}
                           className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-card"
                         >
                           <MoreVertical className="h-4 w-4" />
                         </button>
-                        {openMenuId === (groupKey as any) && (
-                          <div className="absolute right-4 top-11 z-10 w-44 rounded-lg border border-border bg-card text-xs shadow-lg">
-                            <button
-                              onClick={() => {
-                                handleViewProject(task);
-                                setOpenMenuId(null);
-                              }}
-                              className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-background/70"
-                            >
-                              <Eye className="h-4 w-4 text-muted" />
-                              <span>View project</span>
-                            </button>
-                            <button
-                              onClick={() => {
-                                setEditingGroup({ projectId: task.projectId, name: task.name });
-                                setEditedName(task.name);
-                                setEditedStatus(task.status as TaskStatus);
-                                setOpenMenuId(null);
-                              }}
-                              className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-background/70"
-                            >
-                              <Pencil className="h-4 w-4 text-muted" />
-                              <span>Edit task</span>
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (confirm("Are you sure you want to remove this task and all its log entries for this week?")) {
-                                  handleRemoveGroup(task.projectId, task.name);
-                                }
-                                setOpenMenuId(null);
-                              }}
-                              className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-red-500/10 text-red-500"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span>Remove task</span>
-                            </button>
-                          </div>
-                        )}
+                        <ActionMenu
+                          isOpen={openMenuId === groupKey}
+                          onClose={() => setOpenMenuId(null)}
+                          triggerRef={{ current: actionButtonRefs.current[groupKey] ?? null }}
+                        >
+                          <button
+                            onClick={() => {
+                              handleViewProject(task);
+                              setOpenMenuId(null);
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-background/70"
+                          >
+                            <Eye className="h-4 w-4 text-muted" />
+                            <span>View project</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingGroup({ projectId: task.projectId, name: task.name });
+                              setEditedName(task.name);
+                              setEditedStatus(task.status as TaskStatusType);
+                              setOpenMenuId(null);
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-background/70"
+                          >
+                            <Pencil className="h-4 w-4 text-muted" />
+                            <span>Edit task</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to remove this task and all its log entries for this week?")) {
+                                handleRemoveGroup(task.projectId, task.name);
+                              }
+                              setOpenMenuId(null);
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-red-500/10 text-red-500"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span>Remove task</span>
+                          </button>
+                        </ActionMenu>
                       </td>
                     </tr>
                   );
