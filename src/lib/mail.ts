@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { Resend } from 'resend';
 
 /**
  * Sends an invitation email to a newly created employee.
@@ -8,57 +8,43 @@ import nodemailer from "nodemailer";
  * @param name - The employee's full name.
  */
 export async function sendInvitationEmail(email: string, password: string, name: string) {
-    // These should be set in your .env file
-    const host = process.env.SMTP_HOST || "smtp.gmail.com";
-    const port = Number(process.env.SMTP_PORT) || 465;
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
-
-    if (!user || !pass) {
-        console.warn("SMTP_USER or SMTP_PASS not set in environment variables. Cannot send invitation email.");
-        throw new Error("SMTP credentials are not configured on this server");
+    const resendApiKey = process.env.RESEND_API_KEY;
+    
+    if (!resendApiKey) {
+        console.warn("RESEND_API_KEY not set in environment variables. Cannot send invitation email.");
+        throw new Error("Email service is not configured on this server");
     }
 
-    const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465, // true for 465, false for other ports
-        auth: {
-            user,
-            pass,
-        },
-    });
+    const resend = new Resend(resendApiKey);
 
-    const mailOptions = {
-        from: `"Timey" <${user}>`,
-        to: email,
-        subject: "Welcome to Timey - Your Account Details",
-        html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 8px;">
-                <h2 style="color: #10b981;">Welcome to Timey, ${name}!</h2>
-                <p>An account has been created for you by your administrator.</p>
-                <p>You can now log in to the Timey portal using the credentials below:</p>
-                <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
-                    <p style="margin: 0;"><strong>Email:</strong> ${email}</p>
-                    <p style="margin: 5px 0 0 0;"><strong>Password:</strong> ${password}</p>
-                </div>
-                <p>Please make sure to change your password after your first login.</p>
-                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #64748b;">This is an automated email. Please do not reply to this message.</p>
+    const htmlContent = `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <h2 style="color: #10b981;">Welcome to Timey, ${name}!</h2>
+            <p>An account has been created for you by your administrator.</p>
+            <p>You can now log in to the Timey portal using the credentials below:</p>
+            <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                <p style="margin: 0;"><strong>Email:</strong> ${email}</p>
+                <p style="margin: 5px 0 0 0;"><strong>Password:</strong> ${password}</p>
             </div>
-        `,
-    };
+            <p>Please make sure to change your password after your first login.</p>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #64748b;">This is an automated email. Please do not reply to this message.</p>
+        </div>
+    `;
 
     try {
-        console.log("Verifying SMTP connection...");
-        await transporter.verify();
+        console.log("Sending email via Resend API...");
+        const data = await resend.emails.send({
+            from: 'Timey Admin <onboarding@resend.dev>', // Resend test domain
+            to: email,
+            subject: 'Welcome to Timey - Your Account Details',
+            html: htmlContent,
+        });
         
-        console.log("SMTP connection successful. Sending email...");
-        const info = await transporter.sendMail(mailOptions);
-        console.log("Invitation email sent: %s", info.messageId);
-        return info;
+        console.log("Invitation email sent successfully:", data);
+        return data;
     } catch (error: any) {
-        console.error("Error sending invitation email:", error.message || error);
-        throw new Error(`SMTP Error: ${error.message || "Failed to send email"}`);
+        console.error("Error sending invitation email via Resend:", error.message || error);
+        throw new Error(`Email Service Error: ${error.message || "Failed to send email"}`);
     }
 }

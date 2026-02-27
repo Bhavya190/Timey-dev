@@ -24,6 +24,7 @@
     "react-dom": "19.2.1",
     "react-select": "^5.10.2",
     "recharts": "^3.6.0",
+    "resend": "^6.9.2",
     "typescript": "^5"
   },
   "devDependencies": {

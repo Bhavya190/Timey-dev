@@ -117,13 +117,13 @@ export default function AdminEmployees() {
         } else {
           alert(`Employee created successfully! An invitation email with their temporary password has been sent to ${created.email}.`);
         }
-        // Map to summary type for UI
+        // Map to summary type for UI (handling both camelCase and snake_case API returns)
         const summary: Employee = {
           id: created.id,
-          name: `${created.firstName} ${created.lastName}`,
-          firstName: created.firstName,
-          middleName: created.middleName || undefined,
-          lastName: created.lastName,
+          name: `${created.firstName || created.first_name} ${created.lastName || created.last_name}`,
+          firstName: created.firstName || created.first_name,
+          middleName: created.middleName || created.middle_name || undefined,
+          lastName: created.lastName || created.last_name,
           email: created.email,
           department: created.department,
           location: created.location,
@@ -133,20 +133,20 @@ export default function AdminEmployees() {
           shift: created.shift,
           address: created.address,
           city: created.city,
-          stateRegion: created.stateRegion,
+          stateRegion: created.stateRegion || created.state_region,
           country: created.country,
           zip: created.zip,
           phone: created.phone,
-          hireDate: created.hireDate,
-          terminationDate: created.terminationDate || undefined,
-          workType: created.workType,
-          billingType: created.billingType,
-          employeeRate: created.employeeRate,
-          employeeCurrency: created.employeeCurrency,
-          billingRateType: created.billingRateType,
-          billingCurrency: created.billingCurrency,
-          billingStart: created.billingStart,
-          billingEnd: created.billingEnd || undefined,
+          hireDate: created.hireDate || created.hire_date,
+          terminationDate: created.terminationDate || created.termination_date || undefined,
+          workType: created.workType || created.work_type,
+          billingType: created.billingType || created.billing_type,
+          employeeRate: created.employeeRate || created.employee_rate,
+          employeeCurrency: created.employeeCurrency || created.employee_currency,
+          billingRateType: created.billingRateType || created.billing_rate_type,
+          billingCurrency: created.billingCurrency || created.billing_currency,
+          billingStart: created.billingStart || created.billing_start,
+          billingEnd: created.billingEnd || created.billing_end || undefined,
         };
         setEmployees((prev) => [...prev, summary]);
       } else {
