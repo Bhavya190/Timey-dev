@@ -131,9 +131,14 @@ export default function TimeTrackerWidget({ employeeId, className = "" }: TimeTr
                     <p className="font-mono text-sm font-bold tabular-nums tracking-tight text-foreground leading-none">
                         {formatTime(displaySeconds)}
                     </p>
-                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider leading-none mt-0.5" style={{ color: isFinished ? '#ef4444' : isActive ? '#10b981' : status === 'Paused' ? '#f59e0b' : undefined }}>
-                        {isFinished ? "Finished" : isActive ? "Clocked In" : status === "Paused" ? "Paused" : "Not Started"}
-                    </span>
+                    <div className="flex items-center gap-1 mt-0.5">
+                        <span className="text-[9px] font-medium text-muted-foreground tracking-wider leading-none">
+                            {new Date(today).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </span>
+                        <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider leading-none" style={{ color: isFinished ? '#ef4444' : isActive ? '#10b981' : status === 'Paused' ? '#f59e0b' : undefined }}>
+                            • {isFinished ? "Finished" : isActive ? "Clocked In" : status === "Paused" ? "Paused" : "Not Started"}
+                        </span>
+                    </div>
                 </div>
             </div>
 
