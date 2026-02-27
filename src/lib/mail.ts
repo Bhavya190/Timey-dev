@@ -29,7 +29,11 @@ export async function sendInvitationEmail(email: string, password: string, name:
         auth: {
             user,
             pass
-        }
+        },
+        logger: true,
+        debug: true,
+        connectionTimeout: 10000, // 10 seconds
+        socketTimeout: 15000 // 15 seconds
     });
 
     const htmlContent = `
