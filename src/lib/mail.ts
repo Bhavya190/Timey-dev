@@ -8,21 +8,25 @@ import nodemailer from "nodemailer";
  * @param name - The employee's full name.
  */
 export async function sendInvitationEmail(email: string, password: string, name: string) {
-    const mailtrapUser = process.env.MAILTRAP_USER;
-    const mailtrapPass = process.env.MAILTRAP_PASS;
+    const host = process.env.EMAIL_HOST || "sandbox.smtp.mailtrap.io";
+    const port = Number(process.env.EMAIL_PORT) || 2525;
+    const user = process.env.EMAIL_USER;
+    const pass = process.env.EMAIL_PASSWORD;
+    const fromAddress = process.env.EMAIL_FROM_ADDRESS || "admin@timey.com";
+    const fromName = process.env.EMAIL_FROM_NAME || "Timey Admin";
     
-    if (!mailtrapUser || !mailtrapPass) {
-        console.warn("MAILTRAP_USER or MAILTRAP_PASS not set in environment variables. Cannot send email.");
-        throw new Error("Mailtrap credentials are not configured on this server");
+    if (!user || !pass) {
+        console.warn("EMAIL_USER or EMAIL_PASSWORD not set in environment variables. Cannot send email.");
+        throw new Error("Mail credentials are not configured on this server");
     }
 
-    // Configured exactly for Mailtrap
+    // Configured for generic SMTP or Mailtrap
     const transporter = nodemailer.createTransport({
-        host: "sandbox.smtp.mailtrap.io",
-        port: 2525,
+        host,
+        port,
         auth: {
-            user: mailtrapUser,
-            pass: mailtrapPass
+            user,
+            pass
         }
     });
 
@@ -44,7 +48,7 @@ export async function sendInvitationEmail(email: string, password: string, name:
     try {
         console.log("Sending email via Mailtrap...");
         const info = await transporter.sendMail({
-            from: '"Timey Admin" <admin@timey.com>',
+            from: `"${fromName}" <${fromAddress}>`,
             to: email,
             subject: 'Welcome to Timey - Your Account Details',
             html: htmlContent,
