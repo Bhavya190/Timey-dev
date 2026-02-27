@@ -20,6 +20,7 @@ import {
     ChevronRight,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import TimeTrackerWidget from "@/components/TimeTrackerWidget";
 
 const EmployeeCharts = dynamic(() => import("@/components/EmployeeCharts"), {
     ssr: false,
@@ -324,6 +325,9 @@ export default function EmployeeDashboardContent({ currentEmployeeId: propId }: 
                     </button>
                 </div>
             </div>
+
+            {/* Time Tracker Widget */}
+            <TimeTrackerWidget employeeId={currentEmployeeId} />
 
             {/* Summary cards */}
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

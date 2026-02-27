@@ -8,11 +8,13 @@ import {
   fetchProjectsAction,
   fetchClientsAction,
   fetchTasksAction,
+  getCurrentUserAction,
   Project,
   Client,
   User,
   Task as TaskType,
 } from "@/app/actions";
+import TimeTrackerWidget from "@/components/TimeTrackerWidget";
 import dynamic from "next/dynamic";
 import {
   BarChart3,
@@ -68,6 +70,7 @@ export default function AdminDashboard() {
   const [clients, setClients] = useState<Client[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentEmployeeId, setCurrentEmployeeId] = useState<number | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -75,11 +78,13 @@ export default function AdminDashboard() {
       fetchProjectsAction(),
       fetchClientsAction(),
       fetchTasksAction(),
-    ]).then(([u, p, c, t]) => {
+      getCurrentUserAction(),
+    ]).then(([u, p, c, t, session]) => {
       setUsers(u);
       setProjects(p);
       setClients(c);
       setTasks(t);
+      if (session) setCurrentEmployeeId(session.id);
       setIsLoading(false);
     });
   }, []);
@@ -286,6 +291,10 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {currentEmployeeId && (
+        <TimeTrackerWidget employeeId={currentEmployeeId} />
+      )}
 
       {/* Summary cards (3 stats + 1 employee filter) */}
       <div className="grid gap-4 md:grid-cols-4">

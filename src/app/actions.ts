@@ -298,3 +298,42 @@ export async function getCurrentUserAction() {
     console.log(`getCurrentUserAction: session: ${session ? JSON.stringify(session) : 'null'}`);
     return session;
 }
+
+// Mutations - TimeTracking
+import { getDailyTime, clockIn, pauseTime, clockOut } from "@/lib/timetracking";
+
+export async function getDailyTimeAction(employeeId: number, date: string) {
+    try {
+        return await getDailyTime(employeeId, date);
+    } catch (err: any) {
+        console.error("getDailyTime error:", err);
+        return { error: err.message || "Failed to get time." };
+    }
+}
+
+export async function clockInAction(employeeId: number, date: string) {
+    try {
+        return await clockIn(employeeId, date);
+    } catch (err: any) {
+        console.error("clockIn error:", err);
+        return { error: err.message || "Failed to clock in." };
+    }
+}
+
+export async function pauseTimeAction(employeeId: number, date: string) {
+    try {
+        return await pauseTime(employeeId, date);
+    } catch (err: any) {
+        console.error("pauseTime error:", err);
+        return { error: err.message || "Failed to pause." };
+    }
+}
+
+export async function clockOutAction(employeeId: number, date: string) {
+    try {
+        return await clockOut(employeeId, date);
+    } catch (err: any) {
+        console.error("clockOut error:", err);
+        return { error: err.message || "Failed to clock out." };
+    }
+}

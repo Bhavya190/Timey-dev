@@ -25,6 +25,33 @@ async function main() {
 
         if (checkTable.rows[0].exists) {
             console.log("Database tables already exist. Running schema migration for missing columns...");
+            
+            // Check for DailyTime table
+            const checkDailyTime = await pool.query(`
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name = 'DailyTime'
+                );
+            `);
+
+            if (!checkDailyTime.rows[0].exists) {
+                console.log("Creating DailyTime table...");
+                await pool.query(`
+                CREATE TABLE "DailyTime" (
+                    "id" SERIAL PRIMARY KEY,
+                    "employeeId" INTEGER NOT NULL REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+                    "date" TEXT NOT NULL,
+                    "status" TEXT NOT NULL DEFAULT 'Not Started',
+                    "totalSeconds" INTEGER NOT NULL DEFAULT 0,
+                    "lastClockInTime" TIMESTAMP,
+                    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE ("employeeId", "date")
+                );
+                `);
+            }
+            console.log("Database tables already exist. Running schema migration for missing columns...");
             const missingColumns = [
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "middleName" TEXT;`,
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "terminationDate" TEXT;`,
@@ -180,6 +207,21 @@ async function main() {
           "status" TEXT NOT NULL DEFAULT 'Not Submitted',
           "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
           "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+        // DailyTime
+        await pool.query(`
+      CREATE TABLE "DailyTime" (
+          "id" SERIAL PRIMARY KEY,
+          "employeeId" INTEGER NOT NULL REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+          "date" TEXT NOT NULL,
+          "status" TEXT NOT NULL DEFAULT 'Not Started',
+          "totalSeconds" INTEGER NOT NULL DEFAULT 0,
+          "lastClockInTime" TIMESTAMP,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE ("employeeId", "date")
       );
     `);
 
