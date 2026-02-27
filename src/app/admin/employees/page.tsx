@@ -106,7 +106,17 @@ export default function AdminEmployees() {
   const handleSaveEmployee = async (empData: any) => {
     try {
       if (modalMode === "add") {
-        const created: any = await createEmployeeAction(empData);
+        let created: any;
+        try {
+          created = await createEmployeeAction(empData);
+        } catch (serverErr: any) {
+          if (serverErr.message && serverErr.message.toLowerCase().includes("server action")) {
+            alert("The server has just been updated. Refreshing your browser automatically...");
+            window.location.reload();
+            return;
+          }
+          throw serverErr;
+        }
         if (created.error) {
           alert(created.error);
           return;
@@ -157,7 +167,17 @@ export default function AdminEmployees() {
         }
       } else {
         if (!selectedEmployee) return;
-        const updated: any = await updateEmployeeProfileAction(selectedEmployee.id, empData);
+        let updated: any;
+        try {
+          updated = await updateEmployeeProfileAction(selectedEmployee.id, empData);
+        } catch (serverErr: any) {
+          if (serverErr.message && serverErr.message.toLowerCase().includes("server action")) {
+            alert("The server has just been updated. Refreshing your browser automatically...");
+            window.location.reload();
+            return;
+          }
+          throw serverErr;
+        }
         if (updated.error) {
           alert(updated.error);
           return;
