@@ -273,14 +273,21 @@ export default function EmployeeDashboardContent({ currentEmployeeId: propId }: 
                     </p>
                 </div>
 
-                {/* Week range control */}
-                <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted">
-                    <button
-                        type="button"
-                        onClick={goToPreviousWeek}
-                        className="p-1.5 rounded-lg hover:bg-background/80 transition-colors"
-                        title="Previous week"
-                    >
+                {/* Top-right Controls */}
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+                    {/* Time Tracker Widget */}
+                    <div className="hidden sm:block">
+                        <TimeTrackerWidget employeeId={currentEmployeeId} />
+                    </div>
+
+                    {/* Week range control */}
+                    <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-muted h-[38px]">
+                        <button
+                            type="button"
+                            onClick={goToPreviousWeek}
+                            className="p-1 rounded-md hover:bg-background/80 transition-colors"
+                            title="Previous week"
+                        >
                         <ChevronLeft className="h-4 w-4" />
                     </button>
 
@@ -324,10 +331,13 @@ export default function EmployeeDashboardContent({ currentEmployeeId: propId }: 
                         <ChevronRight className="h-4 w-4" />
                     </button>
                 </div>
+                </div>
             </div>
 
-            {/* Time Tracker Widget */}
-            <TimeTrackerWidget employeeId={currentEmployeeId} />
+            {/* Mobile Time Tracker Widget */}
+            <div className="sm:hidden">
+                <TimeTrackerWidget employeeId={currentEmployeeId} className="w-full flex justify-between" />
+            </div>
 
             {/* Summary cards */}
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

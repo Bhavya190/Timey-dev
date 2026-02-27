@@ -115,44 +115,37 @@ export default function TimeTrackerWidget({ employeeId, className = "" }: TimeTr
     };
 
     if (loading && status === "Not Started" && totalSeconds === 0) {
-        return <div className={`animate-pulse rounded-xl border border-border bg-card p-4 h-24 ${className}`} />;
+        return <div className={`animate-pulse rounded-lg border border-border bg-card px-3 py-1.5 h-10 w-48 ${className}`} />;
     }
 
     const isActive = status === "Clocked In";
     const isFinished = status === "Clocked Out";
 
     return (
-        <div className={`rounded-xl border border-border bg-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors ${isActive ? 'border-emerald-500/50 bg-emerald-500/5' : ''} ${className}`}>
-            <div className="flex items-center gap-3 relative">
-                <div className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${isActive ? 'bg-emerald-500 text-white animate-pulse' : 'bg-background text-emerald-500 border border-border'}`}>
-                    <Clock className="h-5 w-5" />
+        <div className={`inline-flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-1.5 transition-colors ${isActive ? 'border-emerald-500/50 bg-emerald-500/5' : ''} ${className}`}>
+            <div className="flex items-center gap-2">
+                <div className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${isActive ? 'bg-emerald-500 text-white animate-pulse' : 'bg-background text-emerald-500 border border-border'}`}>
+                    <Clock className="h-3.5 w-3.5" />
                 </div>
-                <div>
-                    <h3 className="text-sm font-medium text-muted mb-0.5">Today's Time</h3>
-                    <p className="font-mono text-2xl font-bold tabular-nums tracking-tight text-foreground">
+                <div className="flex flex-col">
+                    <p className="font-mono text-sm font-bold tabular-nums tracking-tight text-foreground leading-none">
                         {formatTime(displaySeconds)}
                     </p>
-                    {isFinished && (
-                        <span className="text-[10px] uppercase font-bold text-red-500 tracking-wider">Clocked Out</span>
-                    )}
-                    {isActive && (
-                        <span className="text-[10px] uppercase font-bold text-emerald-500 tracking-wider">Clocked In</span>
-                    )}
-                    {status === "Paused" && (
-                        <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Paused</span>
-                    )}
+                    <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider leading-none mt-0.5" style={{ color: isFinished ? '#ef4444' : isActive ? '#10b981' : status === 'Paused' ? '#f59e0b' : undefined }}>
+                        {isFinished ? "Finished" : isActive ? "Clocked In" : status === "Paused" ? "Paused" : "Not Started"}
+                    </span>
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-2 sm:mt-0">
+            <div className="flex items-center gap-1 border-l border-border pl-3">
                 {(status === "Not Started" || status === "Paused") && !isFinished && (
                     <button
                         onClick={handleClockIn}
                         disabled={loading}
-                        className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-600 disabled:opacity-50 transition-colors"
+                        className="p-1.5 rounded-md bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-50 transition-colors"
+                        title={status === "Paused" ? "Resume" : "Clock In"}
                     >
-                        <Play className="h-4 w-4" fill="currentColor" />
-                        {status === "Paused" ? "Resume" : "Clock In"}
+                        <Play className="h-3.5 w-3.5" fill="currentColor" />
                     </button>
                 )}
 
@@ -160,10 +153,10 @@ export default function TimeTrackerWidget({ employeeId, className = "" }: TimeTr
                     <button
                         onClick={handlePause}
                         disabled={loading}
-                        className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-600 disabled:opacity-50 transition-colors"
+                        className="p-1.5 rounded-md bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50 transition-colors"
+                        title="Pause"
                     >
-                        <Pause className="h-4 w-4" fill="currentColor" />
-                        Pause
+                        <Pause className="h-3.5 w-3.5" fill="currentColor" />
                     </button>
                 )}
 
@@ -171,10 +164,10 @@ export default function TimeTrackerWidget({ employeeId, className = "" }: TimeTr
                     <button
                         onClick={handleClockOut}
                         disabled={loading || status === "Not Started"}
-                        className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-500 hover:text-white disabled:opacity-50 transition-colors"
+                        className="p-1.5 rounded-md bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
+                        title="Clock Out"
                     >
-                        <Square className="h-4 w-4" fill="currentColor" />
-                        Clock Out
+                        <Square className="h-3.5 w-3.5" fill="currentColor" />
                     </button>
                 )}
             </div>

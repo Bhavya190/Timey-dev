@@ -241,9 +241,17 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Date range bar (same style as timesheet) */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground">
+        {/* Top-right Controls */}
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+          {/* Time Tracker Widget */}
+          {currentEmployeeId && (
+            <div className="hidden sm:block">
+              <TimeTrackerWidget employeeId={currentEmployeeId} />
+            </div>
+          )}
+
+          {/* Date range bar (same style as timesheet) */}
+          <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground h-[38px]">
             {/* Previous week */}
             <button
               type="button"
@@ -292,8 +300,11 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Mobile Time Tracker Widget */}
       {currentEmployeeId && (
-        <TimeTrackerWidget employeeId={currentEmployeeId} />
+        <div className="sm:hidden">
+          <TimeTrackerWidget employeeId={currentEmployeeId} className="w-full flex justify-between" />
+        </div>
       )}
 
       {/* Summary cards (3 stats + 1 employee filter) */}
