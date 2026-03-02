@@ -182,10 +182,10 @@ export default function TaskModal({
   const customSelectStyles = {
     control: (base: any, state: any) => ({
       ...base,
-      backgroundColor: "hsl(var(--background))",
+      backgroundColor: "var(--background)",
       borderColor: state.isFocused
         ? "rgb(16 185 129)"
-        : "hsl(var(--border))",
+        : "var(--border)",
       boxShadow: state.isFocused
         ? "0 0 0 1px rgba(16,185,129,0.4)"
         : "none",
@@ -195,7 +195,7 @@ export default function TaskModal({
       ":hover": {
         borderColor: state.isFocused
           ? "rgb(16 185 129)"
-          : "hsl(var(--border))",
+          : "var(--border)",
       },
     }),
     valueContainer: (base: any) => ({
@@ -205,7 +205,7 @@ export default function TaskModal({
     }),
     placeholder: (base: any) => ({
       ...base,
-      color: "hsl(var(--muted-foreground))",
+      color: "var(--muted)",
       fontSize: "0.875rem",
     }),
     multiValue: () => ({
@@ -213,7 +213,7 @@ export default function TaskModal({
     }),
     input: (base: any) => ({
       ...base,
-      color: "hsl(var(--foreground))",
+      color: "var(--foreground)",
       fontSize: "0.875rem",
     }),
     indicatorSeparator: () => ({
@@ -223,7 +223,7 @@ export default function TaskModal({
       ...base,
       color: state.isFocused
         ? "rgb(16 185 129)"
-        : "hsl(var(--muted-foreground))",
+        : "var(--muted)",
       paddingRight: "0.5rem",
       ":hover": {
         color: "rgb(16 185 129)",
@@ -231,13 +231,13 @@ export default function TaskModal({
     }),
     menu: (base: any) => ({
       ...base,
-      backgroundColor: "hsl(var(--card))",
+      backgroundColor: "var(--card)",
       borderRadius: "0.5rem",
       overflow: "hidden",
-      border: "1px solid hsl(var(--border))",
+      border: "1px solid var(--border)",
       boxShadow:
         "0 10px 15px -3px rgba(15,23,42,0.25), 0 4px 6px -4px rgba(15,23,42,0.2)",
-      zIndex: 50,
+      zIndex: 9999,
     }),
     menuList: (base: any) => ({
       ...base,
@@ -257,7 +257,7 @@ export default function TaskModal({
         : state.isFocused
           ? "rgba(148,163,184,0.15)"
           : "transparent",
-      color: "hsl(var(--foreground))",
+      color: "var(--foreground)",
       cursor: "pointer",
     }),
   };
