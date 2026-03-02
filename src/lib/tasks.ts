@@ -30,6 +30,7 @@ export async function getTasks(): Promise<Task[]> {
     billingType: t.billingType as TaskBillingType,
     assigneeIds: relations.filter(r => r.B === t.id).map(r => r.A),
     date: t.startDate,
+    workedHours: Number(t.workedHours) || 0,
     description: t.description ?? undefined,
   }));
 }
@@ -61,6 +62,7 @@ export async function createTask(data: Omit<Task, "id">): Promise<Task> {
     billingType: task.billingType as TaskBillingType,
     assigneeIds: assigneeIds ?? [],
     date: task.startDate,
+    workedHours: Number(task.workedHours) || 0,
     description: task.description ?? undefined,
   };
 }
@@ -103,6 +105,7 @@ export async function updateTask(id: number, data: Partial<Task>): Promise<Task>
     billingType: task.billingType as TaskBillingType,
     assigneeIds: currentRelations.map(r => r.A),
     date: task.startDate,
+    workedHours: Number(task.workedHours) || 0,
     description: task.description ?? undefined,
   };
 }
