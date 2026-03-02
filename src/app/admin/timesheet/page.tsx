@@ -21,7 +21,11 @@ import {
   Edit3,
   Trash2,
   Save,
+  CheckCircle,
 } from "lucide-react";
+
+import { NotificationBell } from "@/components/NotificationBell";
+import { ApprovalsModal } from "@/components/ApprovalsModal";
 
 // Helpers to get by ID from state
 const getEmployeesById = (users: User[]) => Object.fromEntries(users.map((u) => [u.id, u]));
@@ -96,6 +100,16 @@ type PlaceholderState = Record<string, number[]>;
 export default function AdminTimesheetPage() {
   const [currentAnchor, setCurrentAnchor] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showApprovalsModal, setShowApprovalsModal] = useState(false);
+  const [adminId, setAdminId] = useState<number | null>(null);
+
+  useEffect(() => {
+    import("@/app/actions").then(({ getCurrentUserAction }) => {
+      getCurrentUserAction().then((user) => {
+        if (user) setAdminId(user.id);
+      }).catch(console.error);
+    });
+  }, []);
 
   const { days, startISO, endISO } = useMemo(
     () => getWeekRangeFromAnchor(currentAnchor),
@@ -591,6 +605,14 @@ export default function AdminTimesheetPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {adminId && <NotificationBell userId={adminId} />}
+          <button
+            onClick={() => setShowApprovalsModal(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors"
+          >
+            <CheckCircle className="h-4 w-4" />
+            Approvals
+          </button>
           <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground">
             <button
               type="button"
@@ -1195,6 +1217,12 @@ export default function AdminTimesheetPage() {
             </form>
           </div>
         </div>
+      )}
+      {showApprovalsModal && adminId && (
+        <ApprovalsModal
+          adminId={adminId}
+          onClose={() => setShowApprovalsModal(false)}
+        />
       )}
     </main>
   );

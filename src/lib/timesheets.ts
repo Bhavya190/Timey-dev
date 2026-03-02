@@ -31,7 +31,7 @@ export async function upsertTimesheet(data: Omit<Timesheet, "id">): Promise<Time
 
   if (existing.length > 0) {
     const updatedResult = await pool.query(
-      'UPDATE "Timesheet" SET "status" = $1 WHERE "id" = $2 RETURNING *',
+      'UPDATE "Timesheet" SET "status" = $1, "rejectionComment" = NULL WHERE "id" = $2 RETURNING *',
       [status, existing[0].id]
     );
     return updatedResult.rows[0];
@@ -42,4 +42,20 @@ export async function upsertTimesheet(data: Omit<Timesheet, "id">): Promise<Time
     );
     return createdResult.rows[0];
   }
+}
+
+export async function approveTimesheet(timesheetId: number): Promise<Timesheet> {
+  const result = await pool.query(
+    'UPDATE "Timesheet" SET "status" = $1 WHERE "id" = $2 RETURNING *',
+    ["Approved", timesheetId]
+  );
+  return result.rows[0];
+}
+
+export async function rejectTimesheet(timesheetId: number, comment: string): Promise<Timesheet> {
+  const result = await pool.query(
+    'UPDATE "Timesheet" SET "status" = $1, "rejectionComment" = $2 WHERE "id" = $3 RETURNING *',
+    ["Rejected", comment, timesheetId]
+  );
+  return result.rows[0];
 }

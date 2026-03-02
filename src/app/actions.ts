@@ -12,7 +12,8 @@ import type {
     Client,
     Project,
     Task,
-    Timesheet
+    Timesheet,
+    Notification
 } from "@/types";
 
 import {
@@ -44,7 +45,9 @@ import {
 import {
     getTimesheets,
     getEmployeeTimesheets,
-    upsertTimesheet
+    upsertTimesheet,
+    approveTimesheet,
+    rejectTimesheet
 } from "@/lib/timesheets";
 import { sendInvitationEmail } from "@/lib/mail";
 
@@ -175,9 +178,9 @@ export async function createEmployeeAction(data: Omit<Employee, "id">) {
             console.error("Failed to send invitation email:", error);
             emailErrorMsg = error.message || String(error);
         }
-        
+
         revalidatePath("/admin", "layout");
-        
+
         return { ...created, tempPassword, emailSent, emailErrorMsg };
     } catch (err: any) {
         console.error("createEmployeeAction error:", err);
@@ -232,6 +235,10 @@ export async function updateAdminSecurityAction(id: number, data: {
     return await updateEmployeeProfile(id, { password: hashedPassword });
 }
 
+import { getNotifications, addNotification, markNotificationRead, getAdminUserIds } from "@/lib/notifications";
+
+// ... skipping to timesheets ...
+
 // Timesheets
 export async function fetchTimesheetsAction(): Promise<Timesheet[]> {
     return await getTimesheets();
@@ -240,7 +247,58 @@ export async function fetchEmployeeTimesheetsAction(employeeId: number): Promise
     return await getEmployeeTimesheets(employeeId);
 }
 export async function upsertTimesheetAction(data: Omit<Timesheet, "id">) {
-    return await upsertTimesheet(data);
+    const result = await upsertTimesheet(data);
+
+    // Notify admins if submitted
+    if (result.status === "Submitted") {
+        try {
+            const adminIds = await getAdminUserIds();
+            const allUsers = await getUsers();
+            const employeeData = allUsers.find(u => u.id === data.employeeId);
+            const employeeName = employeeData ? employeeData.name : `Employee #${data.employeeId}`;
+            const msg = `${employeeName} has submitted a timesheet for the week of ${data.weekStart}.`;
+            // Add notification for each admin
+            await Promise.all(adminIds.map(id => addNotification(id, msg)));
+        } catch (err) {
+            console.error("Failed to push notifications for timesheet submission:", err);
+        }
+    }
+    return result;
+}
+
+export async function approveTimesheetAction(timesheetId: number, employeeId: number, weekStart: string) {
+    const result = await approveTimesheet(timesheetId);
+
+    // Notify employee
+    try {
+        await addNotification(employeeId, `Your timesheet for the week of ${weekStart} has been approved.`);
+    } catch (err) {
+        console.error("Failed to notify employee of approval:", err);
+    }
+
+    return result;
+}
+
+export async function rejectTimesheetAction(timesheetId: number, employeeId: number, weekStart: string, comment: string) {
+    const result = await rejectTimesheet(timesheetId, comment);
+
+    // Notify employee
+    try {
+        await addNotification(employeeId, `Your timesheet for the week of ${weekStart} was rejected: ${comment}`);
+    } catch (err) {
+        console.error("Failed to notify employee of rejection:", err);
+    }
+
+    return result;
+}
+
+// Notifications
+export async function fetchNotificationsAction(userId: number) {
+    return await getNotifications(userId);
+}
+
+export async function markNotificationReadAction(notificationId: number) {
+    return await markNotificationRead(notificationId);
 }
 
 // Authentication

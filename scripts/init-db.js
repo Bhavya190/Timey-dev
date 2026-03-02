@@ -25,7 +25,7 @@ async function main() {
 
         if (checkTable.rows[0].exists) {
             console.log("Database tables already exist. Running schema migration for missing columns...");
-            
+
             // Check for DailyTime table
             const checkDailyTime = await pool.query(`
                 SELECT EXISTS (
@@ -64,7 +64,8 @@ async function main() {
                 `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "zip" TEXT;`,
                 `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "contactNumber" TEXT;`,
                 `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "defaultRate" TEXT;`,
-                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "fixedBidMode" BOOLEAN DEFAULT false;`
+                `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "fixedBidMode" BOOLEAN DEFAULT false;`,
+                `ALTER TABLE "Timesheet" ADD COLUMN IF NOT EXISTS "rejectionComment" TEXT;`
             ];
             for (const migration of missingColumns) {
                 try {
@@ -73,6 +74,29 @@ async function main() {
                     console.log("Migration error:", err.message);
                 }
             }
+
+            // Check for Notification table
+            const checkNotification = await pool.query(`
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name = 'Notification'
+                );
+            `);
+
+            if (!checkNotification.rows[0].exists) {
+                console.log("Creating Notification table...");
+                await pool.query(`
+                CREATE TABLE "Notification" (
+                    "id" SERIAL PRIMARY KEY,
+                    "userId" INTEGER NOT NULL REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+                    "message" TEXT NOT NULL,
+                    "isRead" BOOLEAN NOT NULL DEFAULT false,
+                    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                `);
+            }
+
             console.log("Schema migration complete. Skipping full initialization.");
             return;
         }
@@ -205,8 +229,20 @@ async function main() {
           "employeeId" INTEGER NOT NULL REFERENCES "Employee"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
           "weekStart" TEXT NOT NULL,
           "status" TEXT NOT NULL DEFAULT 'Not Submitted',
+          "rejectionComment" TEXT,
           "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
           "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+        // Notification
+        await pool.query(`
+      CREATE TABLE "Notification" (
+          "id" SERIAL PRIMARY KEY,
+          "userId" INTEGER NOT NULL REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+          "message" TEXT NOT NULL,
+          "isRead" BOOLEAN NOT NULL DEFAULT false,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `);
 

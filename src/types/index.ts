@@ -113,5 +113,14 @@ export interface Timesheet {
     id: number;
     employeeId: number;
     weekStart: string; // ISO date string (Monday)
-    status: string;    // "Not Submitted", "Submitted"
+    status: string;    // "Not Submitted", "Submitted", "Approved", "Rejected"
+    rejectionComment?: string;
+}
+
+export interface Notification {
+    id: number;
+    userId: number;
+    message: string;
+    isRead: boolean;
+    createdAt: string;
 }

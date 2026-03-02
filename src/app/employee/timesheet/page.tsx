@@ -26,7 +26,10 @@ import {
   Save,
   ClipboardClock,
   FileInput,
+  AlertCircle
 } from "lucide-react";
+import { NotificationBell } from "@/components/NotificationBell";
+import toast from "react-hot-toast";
 
 
 // Helpers to get by ID from state
@@ -157,9 +160,15 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
   const weekKey = startISO;
   const todayISO = toLocalISODate(new Date());
 
-  const isSubmitted = useMemo(() => {
-    return dbTimesheets.find(ts => ts.weekStart === weekKey)?.status === "Submitted";
+  const currentTimesheet = useMemo(() => {
+    return dbTimesheets.find(ts => ts.weekStart === weekKey);
   }, [dbTimesheets, weekKey]);
+
+  const isSubmitted = currentTimesheet?.status === "Submitted";
+  const isApproved = currentTimesheet?.status === "Approved";
+  const isRejected = currentTimesheet?.status === "Rejected";
+
+  const isLocked = isSubmitted || isApproved;
 
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -221,7 +230,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
   const [editedDescription, setEditedDescription] = useState<string>("");
 
   const openEditFor = (task: Task, date: string) => {
-    if (isSubmitted) return;
+    if (isLocked) return;
     const gKey = getTaskGroupKey(task);
     setEditTarget({ taskId: task.id, date });
     const cellHours = hoursByTaskDay[gKey]?.[date] ?? 0;
@@ -240,7 +249,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
 
   const handleSaveEdit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!editTarget || isSubmitted) return;
+    if (!editTarget || isLocked) return;
     const { taskId, date } = editTarget;
     const newHours = Number(editedHours) || 0;
     const desc = editedDescription.trim() || undefined;
@@ -299,10 +308,11 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
             .map((t) => (t.id === updated.id ? updated : t))
         );
       }
+      toast.success("Hours updated");
       closeEdit();
     } catch (err) {
       console.error("Failed to save timesheet edit:", err);
-      alert("Failed to save changes. Please try again.");
+      toast.error("Failed to save changes. Please try again.");
     }
   };
 
@@ -336,7 +346,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
   };
 
   const openRowEditor = (rowId: number | null) => {
-    if (isSubmitted) return;
+    if (isLocked) return;
     if (rowId === null) {
       const newId = Date.now();
       setWeekPlaceholders(weekKey, (prev) => [...prev, newId]);
@@ -377,6 +387,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
 
       setTasks((prev) => [...prev, created]);
       setShowRowEditor(false);
+      toast.success("Task added to timesheet");
 
       if (rowDraft.rowId !== null) {
         setWeekPlaceholders(weekKey, (prev) =>
@@ -385,7 +396,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
       }
     } catch (err) {
       console.error("Failed to add row:", err);
-      alert("Failed to add row. Please try again.");
+      toast.error("Failed to add row. Please try again.");
     }
   };
 
@@ -406,7 +417,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
   };
 
   const handleSubmitWeek = async () => {
-    if (isSubmitted || currentEmployeeId == null) return;
+    if (isLocked || currentEmployeeId == null) return;
     try {
       const updated = await upsertTimesheetAction({
         employeeId: currentEmployeeId,
@@ -417,9 +428,10 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
         const other = prev.filter(ts => ts.id !== updated.id);
         return [...other, updated];
       });
+      toast.success("Timesheet submitted for approval!");
     } catch (err) {
       console.error("Failed to submit week:", err);
-      alert("Failed to submit week. Please try again.");
+      toast.error("Failed to submit week. Please try again.");
     }
   };
 
@@ -460,63 +472,78 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
           </div>
         </div>
 
-        {/* Week nav */}
-        <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground">
-          <button
-            type="button"
-            onClick={goPrevWeek}
-            className="p-1.5 rounded-lg hover:bg-background/80 transition-colors"
-            title="Previous week"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
+        {/* Week nav + Notification Bell */}
+        <div className="flex items-center gap-2">
+          <NotificationBell userId={currentEmployeeId} />
 
-          <div className="flex items-center gap-2">
-            <span>
-              {formatDateShortWithYear(startISO)} –{" "}
-              {formatDateShortWithYear(endISO)}
-            </span>
-            <div
-              className="relative h-7 w-7 cursor-pointer"
-              onClick={() => {
-                const input = document.getElementById('timesheet-date-picker') as HTMLInputElement;
-                if (input) {
-                  if (typeof input.showPicker === 'function') {
-                    input.showPicker();
-                  } else {
-                    input.click();
-                  }
-                }
-              }}
+          <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground">
+            <button
+              type="button"
+              onClick={goPrevWeek}
+              className="p-1.5 rounded-lg hover:bg-background/80 transition-colors"
+              title="Previous week"
             >
-              <input
-                id="timesheet-date-picker"
-                type="date"
-                value={startISO}
-                onChange={(e) => {
-                  if (!e.target.value) return;
-                  const selectedDate = new Date(e.target.value);
-                  setCurrentAnchor(selectedDate);
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-2">
+              <span>
+                {formatDateShortWithYear(startISO)} –{" "}
+                {formatDateShortWithYear(endISO)}
+              </span>
+              <div
+                className="relative h-7 w-7 cursor-pointer"
+                onClick={() => {
+                  const input = document.getElementById('timesheet-date-picker') as HTMLInputElement;
+                  if (input) {
+                    if (typeof input.showPicker === 'function') {
+                      input.showPicker();
+                    } else {
+                      input.click();
+                    }
+                  }
                 }}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                aria-label="Select week date"
-              />
-              <div className="absolute inset-0 flex items-center justify-center rounded-md border border-border bg-background text-muted hover:bg-card pointer-events-none z-10">
-                <Calendar className="h-3.5 w-3.5" />
+              >
+                <input
+                  id="timesheet-date-picker"
+                  type="date"
+                  value={startISO}
+                  onChange={(e) => {
+                    if (!e.target.value) return;
+                    const selectedDate = new Date(e.target.value);
+                    setCurrentAnchor(selectedDate);
+                  }}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                  aria-label="Select week date"
+                />
+                <div className="absolute inset-0 flex items-center justify-center rounded-md border border-border bg-background text-muted hover:bg-card pointer-events-none z-10">
+                  <Calendar className="h-3.5 w-3.5" />
+                </div>
               </div>
             </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={goNextWeek}
-            className="p-1.5 rounded-lg hover:bg-background/80 transition-colors"
-            title="Next week"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
+            <button
+              type="button"
+              onClick={goNextWeek}
+              className="p-1.5 rounded-lg hover:bg-background/80 transition-colors"
+              title="Next week"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
+
+      {isRejected && (
+        <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-foreground">
+          <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
+          <div>
+            <p className="font-semibold text-red-500 mb-1">Timesheet Rejected</p>
+            <p className="text-muted-foreground">{currentTimesheet?.rejectionComment}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Please make the requested changes and submit again.</p>
+          </div>
+        </div>
+      )}
 
       {/* Summary cards */}
       <section className="grid gap-3 sm:grid-cols-3">
@@ -551,8 +578,11 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
           </span>
           <div>
             <p className="text-muted mb-1">Status</p>
-            <p className="text-xl font-semibold">
-              {isSubmitted ? "Submitted" : "Not Submitted"}
+            <p className={`text-xl font-semibold ${isApproved ? "text-emerald-500" :
+              isRejected ? "text-red-500" :
+                isSubmitted ? "text-blue-500" : ""
+              }`}>
+              {currentTimesheet?.status || "Not Submitted"}
             </p>
           </div>
         </div>
@@ -569,8 +599,8 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
             <button
               type="button"
               onClick={() => openRowEditor(null)}
-              disabled={isSubmitted}
-              className={`inline-flex items-center gap-1 rounded-lg border border-dashed border-border px-3 py-1.5 text-xs ${isSubmitted
+              disabled={isLocked}
+              className={`inline-flex items-center gap-1 rounded-lg border border-dashed border-border px-3 py-1.5 text-xs ${isLocked
                 ? "text-muted opacity-60 cursor-not-allowed"
                 : "text-muted hover:bg-card"
                 }`}
@@ -582,14 +612,14 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
             <button
               type="button"
               onClick={handleSubmitWeek}
-              disabled={isSubmitted}
-              className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-semibold shadow-sm ${isSubmitted
+              disabled={isLocked}
+              className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-semibold shadow-sm ${isLocked
                 ? "bg-emerald-500/10 text-emerald-500 cursor-default"
                 : "bg-emerald-500 text-slate-950 hover:bg-emerald-400"
                 }`}
             >
               <FileInput className="h-3.5 w-3.5" />
-              {isSubmitted ? "Week Submitted" : "Submit week"}
+              {isApproved ? "Approved" : isSubmitted ? "Submitted" : isRejected ? "Resubmit Week" : "Submit week"}
             </button>
           </div>
         </div>
