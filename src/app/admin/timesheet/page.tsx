@@ -847,6 +847,9 @@ export default function AdminTimesheetPage() {
 
       {/* Weekly grid with totals footer */}
       <section className="rounded-2xl border border-border bg-card overflow-visible">
+        <span className="text-xs text-muted">
+            Manage your timesheet rows for this week.(Click on hours to update task hours.)
+        </span>
         <div className="border-b border-border px-4 py-2 bg-background/60 flex justify-end">
           <button
             type="button"
