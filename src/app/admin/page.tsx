@@ -186,6 +186,32 @@ export default function AdminDashboard() {
       .map(([date, hours]) => ({ date, hours }));
   }, [filteredTasks]);
 
+  // Billable hours per date (filtered)
+  const billableHoursByDateData = useMemo(() => {
+    const map = new Map<string, number>();
+    filteredTasks.forEach((t) => {
+      if (t.billingType === "billable") {
+        map.set(t.date, (map.get(t.date) ?? 0) + t.workedHours);
+      }
+    });
+    return Array.from(map.entries())
+      .sort(([a], [b]) => sortByDate(a, b))
+      .map(([date, hours]) => ({ date, hours }));
+  }, [filteredTasks]);
+
+  // Non-Billable hours per date (filtered)
+  const nonBillableHoursByDateData = useMemo(() => {
+    const map = new Map<string, number>();
+    filteredTasks.forEach((t) => {
+      if (t.billingType === "non-billable") {
+        map.set(t.date, (map.get(t.date) ?? 0) + t.workedHours);
+      }
+    });
+    return Array.from(map.entries())
+      .sort(([a], [b]) => sortByDate(a, b))
+      .map(([date, hours]) => ({ date, hours }));
+  }, [filteredTasks]);
+
   // Totals
   const totalEmployees = employees.length;
   const activeProjects = projects.filter((p) => p.status === "Active").length;
@@ -402,6 +428,8 @@ export default function AdminDashboard() {
         tasksByStatusData={tasksByStatusData}
         tasksByDateData={tasksByDateData}
         hoursByDateData={hoursByDateData}
+        billableHoursByDateData={billableHoursByDateData}
+        nonBillableHoursByDateData={nonBillableHoursByDateData}
         selectedEmployeeName={selectedEmployeeName}
         dateLabel={dateLabel}
       />

@@ -25,6 +25,8 @@ interface AdminDashboardChartsProps {
     tasksByStatusData: { name: string; value: number }[];
     tasksByDateData: { date: string; count: number }[];
     hoursByDateData: { date: string; hours: number }[];
+    billableHoursByDateData: { date: string; hours: number }[];
+    nonBillableHoursByDateData: { date: string; hours: number }[];
     selectedEmployeeName: string;
     dateLabel: string;
 }
@@ -35,6 +37,8 @@ export default function AdminDashboardCharts({
     tasksByStatusData,
     tasksByDateData,
     hoursByDateData,
+    billableHoursByDateData,
+    nonBillableHoursByDateData,
     selectedEmployeeName,
     dateLabel,
 }: AdminDashboardChartsProps) {
@@ -207,6 +211,66 @@ export default function AdminDashboardCharts({
                                 type="monotone"
                                 dataKey="hours"
                                 stroke="#3b82f6"
+                                strokeWidth={2}
+                                dot={{ r: 3 }}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            {/* Billable Hours per date */}
+            <div className="rounded-xl border border-border bg-card p-4 flex flex-col xl:col-span-1">
+                <p className="text-xs text-muted mb-1">
+                    Billable hours by date
+                </p>
+                <p className="text-[11px] text-muted mb-2">
+                    {selectedEmployeeName}, {dateLabel}
+                </p>
+                <div className="flex-1 min-h-[260px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={billableHoursByDateData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                            <XAxis
+                                dataKey="date"
+                                tick={{ fontSize: 10, fill: "#9ca3af" }}
+                            />
+                            <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} />
+                            <Tooltip />
+                            <Line
+                                type="monotone"
+                                dataKey="hours"
+                                stroke="#22c55e"
+                                strokeWidth={2}
+                                dot={{ r: 3 }}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            {/* Non-Billable Hours per date */}
+            <div className="rounded-xl border border-border bg-card p-4 flex flex-col xl:col-span-2">
+                <p className="text-xs text-muted mb-1">
+                    Non-Billable hours by date
+                </p>
+                <p className="text-[11px] text-muted mb-2">
+                    {selectedEmployeeName}, {dateLabel}
+                </p>
+                <div className="flex-1 min-h-[260px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={nonBillableHoursByDateData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                            <XAxis
+                                dataKey="date"
+                                tick={{ fontSize: 10, fill: "#9ca3af" }}
+                            />
+                            <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} />
+                            <Tooltip />
+                            <Line
+                                type="monotone"
+                                dataKey="hours"
+                                stroke="#ef4444"
                                 strokeWidth={2}
                                 dot={{ r: 3 }}
                             />
