@@ -50,6 +50,13 @@ import {
     rejectTimesheet
 } from "@/lib/timesheets";
 import { sendInvitationEmail } from "@/lib/mail";
+import {
+    moveToTrash,
+    getTrashForUser,
+    getAllTrash,
+    restoreFromTrash,
+    hardDeleteTrash,
+} from "@/lib/trash";
 
 // Re-export types for convenience
 export type { User, Employee, EmployeeProfile, Client, Project, Task, Timesheet };
@@ -105,6 +112,12 @@ export async function updateClientAction(id: number, data: Partial<Client>) {
 }
 export async function deleteClientAction(id: number) {
     try {
+        const clients = await getClients();
+        const client = clients.find(c => c.id === id);
+        if (client) {
+            const user = await getCurrentUserAction();
+            if (user) await moveToTrash(user.id, "Client", id, client);
+        }
         await deleteClient(id);
         return { success: true };
     } catch (err: any) {
@@ -121,6 +134,12 @@ export async function updateProjectAction(id: number, data: Partial<Project>) {
     return await updateProject(id, data);
 }
 export async function deleteProjectAction(id: number) {
+    const projects = await getProjects();
+    const proj = projects.find(p => p.id === id);
+    if (proj) {
+        const user = await getCurrentUserAction();
+        if (user) await moveToTrash(user.id, "Project", id, proj);
+    }
     return await deleteProject(id);
 }
 
@@ -140,6 +159,12 @@ export async function updateTaskAction(id: number, data: Partial<Task>) {
     });
 }
 export async function deleteTaskAction(id: number) {
+    const tasks = await getTasks();
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        const user = await getCurrentUserAction();
+        if (user) await moveToTrash(user.id, "Task", id, task);
+    }
     return await deleteTask(id);
 }
 
@@ -199,6 +224,13 @@ export async function updateEmployeeProfileAction(id: number, data: Partial<Empl
 }
 export async function deleteEmployeeAction(id: number) {
     try {
+        const employees = await getEmployees();
+        const emp = employees.find(e => e.id === id);
+        if (emp) {
+            // make sure password goes through carefully
+            const user = await getCurrentUserAction();
+            if (user) await moveToTrash(user.id, "Employee", id, emp);
+        }
         await deleteEmployee(id);
         revalidatePath("/admin", "layout");
         return { success: true };
@@ -301,8 +333,30 @@ export async function markNotificationReadAction(notificationId: number) {
     return await markNotificationRead(notificationId);
 }
 
-export async function markAllNotificationsReadAction(userId: number) {
-    return await markAllNotificationsRead(userId);
+export async function markAllNotificationsReadAction() {
+    const user = await getCurrentUserAction();
+    if (!user) return;
+    return await markAllNotificationsRead(user.id);
+}
+
+// Trash Actions
+export async function fetchTrashAction() {
+    const user = await getCurrentUserAction();
+    if (!user) return [];
+    if (user.role === "admin") {
+        return await getAllTrash();
+    }
+    return await getTrashForUser(user.id);
+}
+
+export async function restoreTrashAction(id: number) {
+    await restoreFromTrash(id);
+    revalidatePath("/", "layout");
+}
+
+export async function hardDeleteTrashAction(id: number) {
+    await hardDeleteTrash(id);
+    revalidatePath("/", "layout");
 }
 
 // Authentication

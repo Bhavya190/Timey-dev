@@ -11,6 +11,7 @@ import {
   LogOut,
   User as UserIcon,
   Settings,
+  Trash2,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useUser } from "@/components/UserProvider";
@@ -21,6 +22,7 @@ const employeeLinks = [
   { href: "/employee/projects", label: "My Projects", icon: FolderKanban },
   { href: "/employee/tasks", label: "My Tasks", icon: ListTodo },
   { href: "/employee/settings", label: "Settings", icon: Settings },
+  { href: "/employee/trash", label: "Trash", icon: Trash2 },
 ];
 
 export default function EmployeeLayout({

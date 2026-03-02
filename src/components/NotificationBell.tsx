@@ -74,7 +74,7 @@ export function NotificationBell({ userId }: { userId: number }) {
             try {
                 // Optimistically clear the unread UI state right away
                 setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-                await markAllNotificationsReadAction(userId);
+                await markAllNotificationsReadAction();
             } catch (err) {
                 console.error("Failed to mark all as read:", err);
                 // Re-fetch to restore state if it failed

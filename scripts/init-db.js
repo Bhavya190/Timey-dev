@@ -97,6 +97,29 @@ async function main() {
                 `);
             }
 
+            // Check for Trash table
+            const checkTrash = await pool.query(`
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name = 'Trash'
+                );
+            `);
+
+            if (!checkTrash.rows[0].exists) {
+                console.log("Creating Trash table...");
+                await pool.query(`
+                CREATE TABLE "Trash" (
+                    "id" SERIAL PRIMARY KEY,
+                    "userId" INTEGER NOT NULL REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+                    "entityType" TEXT NOT NULL,
+                    "entityId" INTEGER NOT NULL,
+                    "entityData" JSONB NOT NULL,
+                    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                `);
+            }
+
             console.log("Schema migration complete. Skipping full initialization.");
             return;
         }
@@ -242,6 +265,18 @@ async function main() {
           "userId" INTEGER NOT NULL REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE,
           "message" TEXT NOT NULL,
           "isRead" BOOLEAN NOT NULL DEFAULT false,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+        // Trash
+        await pool.query(`
+      CREATE TABLE "Trash" (
+          "id" SERIAL PRIMARY KEY,
+          "userId" INTEGER NOT NULL REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+          "entityType" TEXT NOT NULL,
+          "entityId" INTEGER NOT NULL,
+          "entityData" JSONB NOT NULL,
           "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `);

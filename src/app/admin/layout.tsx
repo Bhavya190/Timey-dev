@@ -13,6 +13,7 @@ import {
   User as UserIcon,
   Clock,
   CheckSquare,
+  Trash2,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { logoutAction } from "@/app/actions";
@@ -27,6 +28,7 @@ const adminLinks = [
   { href: "/admin/projects", label: "Projects", icon: FolderKanban },
   { href: "/admin/tasks", label: "Tasks", icon: ClipboardList },
   { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/trash", label: "Trash", icon: Trash2 },
 ];
 
 export default function AdminLayout({
