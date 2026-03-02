@@ -220,7 +220,7 @@ export default function AdminDashboardCharts({
             </div>
 
             {/* Billable Hours per date */}
-            <div className="rounded-xl border border-border bg-card p-4 flex flex-col xl:col-span-1">
+            <div className="rounded-xl border border-border bg-card p-4 flex flex-col xl:col-span-2">
                 <p className="text-xs text-muted mb-1">
                     Billable hours by date
                 </p>
@@ -250,7 +250,7 @@ export default function AdminDashboardCharts({
             </div>
 
             {/* Non-Billable Hours per date */}
-            <div className="rounded-xl border border-border bg-card p-4 flex flex-col xl:col-span-2">
+            <div className="rounded-xl border border-border bg-card p-4 flex flex-col xl:col-span-1">
                 <p className="text-xs text-muted mb-1">
                     Non-Billable hours by date
                 </p>
