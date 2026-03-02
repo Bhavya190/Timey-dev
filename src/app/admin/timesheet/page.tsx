@@ -321,7 +321,8 @@ export default function AdminTimesheetPage() {
 
   const handleSaveEdit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!editTarget) return;
+    if (!editTarget || isSaving) return;
+    setIsSaving(true);
     const { taskId, date } = editTarget;
     const newHours = Number(editedHours) || 0;
     const desc = editedDescription.trim() || undefined;
@@ -373,6 +374,8 @@ export default function AdminTimesheetPage() {
     } catch (err) {
       console.error("Failed to save timesheet edit:", err);
       alert("Failed to save changes. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -425,6 +428,7 @@ export default function AdminTimesheetPage() {
     rowId: null,
   });
   const [showRowEditor, setShowRowEditor] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const setWeekPlaceholders = (
     week: string,
@@ -465,7 +469,8 @@ export default function AdminTimesheetPage() {
   }, [weekTasks]);
 
   const handleSaveRowDraft = async () => {
-    if (!rowDraft.projectId || !rowDraft.taskId) return;
+    if (!rowDraft.projectId || !rowDraft.taskId || isSaving) return;
+    setIsSaving(true);
 
     try {
       const project = projectsById[rowDraft.projectId];
@@ -501,6 +506,8 @@ export default function AdminTimesheetPage() {
     } catch (err) {
       console.error("Failed to add row:", err);
       alert("Failed to add row. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -847,20 +854,20 @@ export default function AdminTimesheetPage() {
 
       {/* Weekly grid with totals footer */}
       <section className="rounded-2xl border border-border bg-card overflow-visible">
-        
+
         <div className="border-b border-border px-4 py-2 bg-background/60 flex justify-between items-center">
           <span className="text-xs text-muted">
             Manage your timesheet rows for this week.(Click on hours to update task hours.)
           </span>
           <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => openRowEditor(null)}
-            className="inline-flex items-center gap-1 rounded-lg border border-dashed border-border px-3 py-1.5 text-xs text-muted hover:bg-card"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span>Add row</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => openRowEditor(null)}
+              className="inline-flex items-center gap-1 rounded-lg border border-dashed border-border px-3 py-1.5 text-xs text-muted hover:bg-card"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add row</span>
+            </button>
           </div>
         </div>
 
@@ -1046,6 +1053,7 @@ export default function AdminTimesheetPage() {
                   onChange={(e) => setEditedHours(e.target.value)}
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40"
                   required
+                  disabled={isSaving}
                 />
               </div>
 
@@ -1062,6 +1070,7 @@ export default function AdminTimesheetPage() {
                   rows={3}
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 resize-y"
                   placeholder="Briefly describe what was done in this time."
+                  disabled={isSaving}
                 />
               </div>
 
@@ -1075,10 +1084,11 @@ export default function AdminTimesheetPage() {
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-4 py-1.5 text-xs text-foreground hover:bg-card"
+                  disabled={isSaving}
+                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-4 py-1.5 text-xs text-foreground hover:bg-card disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <Clock4 className="h-3.5 w-3.5" />
-                  <span>Save</span>
+                  <span>{isSaving ? "Saving..." : "Save"}</span>
                 </button>
               </div>
             </form>
@@ -1167,10 +1177,11 @@ export default function AdminTimesheetPage() {
               <div className="flex items-center justify-end gap-2 border-t border-border bg-background/60 px-5 py-3">
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-4 py-1.5 text-xs text-foreground hover:bg-card"
+                  disabled={isSaving}
+                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-4 py-1.5 text-xs text-foreground hover:bg-card disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <Save className="h-3.5 w-3.5" />
-                  <span>Save</span>
+                  <span>{isSaving ? "Saving..." : "Save"}</span>
                 </button>
                 <button
                   type="button"

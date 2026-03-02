@@ -240,7 +240,8 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
 
   const handleSaveEdit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!editTarget || isSubmitted) return;
+    if (!editTarget || isSubmitted || isSaving) return;
+    setIsSaving(true);
     const { taskId, date } = editTarget;
     const newHours = Number(editedHours) || 0;
     const desc = editedDescription.trim() || undefined;
@@ -289,6 +290,8 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
     } catch (err) {
       console.error("Failed to save timesheet edit:", err);
       alert("Failed to save changes. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -303,6 +306,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
     rowId: null,
   });
   const [showRowEditor, setShowRowEditor] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const setWeekPlaceholders = (
     week: string,
@@ -335,8 +339,9 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
 
 
   const handleSaveRowDraft = async () => {
-    if (!rowDraft.projectId || !rowDraft.taskId || currentEmployeeId == null)
+    if (!rowDraft.projectId || !rowDraft.taskId || currentEmployeeId == null || isSaving)
       return;
+    setIsSaving(true);
 
     try {
       const project = projectsById[rowDraft.projectId];
@@ -372,6 +377,8 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
     } catch (err) {
       console.error("Failed to add row:", err);
       alert("Failed to add row. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -767,7 +774,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
                   onChange={(e) => setEditedHours(e.target.value)}
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40"
                   required
-                  disabled={isSubmitted}
+                  disabled={isSubmitted || isSaving}
                 />
               </div>
 
@@ -784,7 +791,7 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
                   rows={3}
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 resize-y"
                   placeholder="Briefly describe what was done in this time."
-                  disabled={isSubmitted}
+                  disabled={isSubmitted || isSaving}
                 />
               </div>
 
@@ -799,10 +806,11 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
                 {!isSubmitted && (
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-4 py-1.5 text-xs text-foreground hover:bg-card"
+                    disabled={isSaving}
+                    className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-4 py-1.5 text-xs text-foreground hover:bg-card disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <Clock4 className="h-3.5 w-3.5" />
-                    <span>Save</span>
+                    <span>{isSaving ? "Saving..." : "Save"}</span>
                   </button>
                 )}
               </div>
@@ -896,11 +904,11 @@ export default function EmployeeTimesheetPage({ currentEmployeeId: propId }: { c
               <div className="flex items-center justify-end gap-2 border-t border-border bg-background/60 px-5 py-3">
                 <button
                   type="submit"
-                  disabled={isSubmitted}
+                  disabled={isSubmitted || isSaving}
                   className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-4 py-1.5 text-xs text-foreground hover:bg-card disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <Save className="h-3.5 w-3.5" />
-                  <span>Save</span>
+                  <span>{isSaving ? "Saving..." : "Save"}</span>
                 </button>
                 <button
                   type="button"
