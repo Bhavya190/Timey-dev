@@ -491,6 +491,30 @@ export default function AdminTasks() {
         </div>
       </div>
 
+      {/* View Toggle */}
+      <div className="flex justify-start">
+        <div className="inline-flex rounded-lg border border-border bg-card p-1 text-xs">
+          <button
+            onClick={() => setViewMode("logs")}
+            className={`px-4 py-1.5 rounded-md font-medium transition-colors ${viewMode === "logs"
+              ? "bg-emerald-500 text-slate-950 shadow-sm"
+              : "text-muted hover:text-foreground"
+              }`}
+          >
+            Task Logs
+          </button>
+          <button
+            onClick={() => setViewMode("summary")}
+            className={`px-4 py-1.5 rounded-md font-medium transition-colors ${viewMode === "summary"
+              ? "bg-emerald-500 text-slate-950 shadow-sm"
+              : "text-muted hover:text-foreground"
+              }`}
+          >
+            Task Summary
+          </button>
+        </div>
+      </div>
+
       {/* Container */}
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
         {/* Toolbar (count + search + toggle) */}
@@ -515,27 +539,6 @@ export default function AdminTasks() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full sm:w-64 rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40"
             />
-
-            <div className="inline-flex rounded-lg border border-border bg-background p-1 text-xs">
-              <button
-                onClick={() => setViewMode("logs")}
-                className={`px-4 py-1.5 rounded-md font-medium transition-colors ${viewMode === "logs"
-                  ? "bg-emerald-500 text-slate-950 shadow-sm"
-                  : "text-muted hover:text-foreground"
-                  }`}
-              >
-                Task Logs
-              </button>
-              <button
-                onClick={() => setViewMode("summary")}
-                className={`px-4 py-1.5 rounded-md font-medium transition-colors ${viewMode === "summary"
-                  ? "bg-emerald-500 text-slate-950 shadow-sm"
-                  : "text-muted hover:text-foreground"
-                  }`}
-              >
-                Task Summary
-              </button>
-            </div>
 
             <button
               onClick={handleExportCSV}
