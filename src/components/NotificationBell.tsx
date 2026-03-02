@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { Bell, Check, Clock4 } from "lucide-react";
 import { fetchNotificationsAction, markNotificationReadAction, markAllNotificationsReadAction } from "@/app/actions";
 import type { Notification } from "@/types";
@@ -10,6 +11,8 @@ export function NotificationBell({ userId }: { userId: number }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
+    const pathname = usePathname();
 
     const fetchNotifs = async () => {
         try {
@@ -80,6 +83,15 @@ export function NotificationBell({ userId }: { userId: number }) {
         }
     };
 
+    const handleNotificationClick = (notif: Notification) => {
+        setIsOpen(false);
+        if (pathname.startsWith('/admin') && notif.message.includes('submitted')) {
+            router.push('/admin/approvals');
+        } else if (pathname.startsWith('/employee')) {
+            router.push('/employee/timesheet');
+        }
+    };
+
     return (
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <button
@@ -109,7 +121,8 @@ export function NotificationBell({ userId }: { userId: number }) {
                             notifications.map((notif) => (
                                 <div
                                     key={notif.id}
-                                    className={`flex items-start gap-3 p-3 rounded-lg text-sm transition-colors ${notif.isRead ? "bg-transparent text-muted-foreground" : "bg-primary-500/5 text-foreground font-medium border border-primary-500/20"
+                                    onClick={() => handleNotificationClick(notif)}
+                                    className={`flex items-start gap-3 p-3 rounded-lg text-sm transition-colors cursor-pointer ${notif.isRead ? "bg-transparent text-muted-foreground hover:bg-muted" : "bg-primary-500/5 text-foreground font-medium border border-primary-500/20 hover:bg-primary-500/10"
                                         }`}
                                 >
                                     <div className="shrink-0 mt-0.5 text-primary-500">

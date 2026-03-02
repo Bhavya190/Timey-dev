@@ -1,17 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Check, XCircle, Clock4, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, XCircle, Clock4, ChevronDown, ChevronUp } from "lucide-react";
 import { fetchTimesheetsAction, approveTimesheetAction, rejectTimesheetAction, fetchUsersAction, fetchTasksAction, fetchProjectsAction } from "@/app/actions";
 import type { Timesheet, User, Task, Project } from "@/types";
 import toast from "react-hot-toast";
 
-interface Props {
-    onClose: () => void;
-    adminId: number;
-}
-
-export function ApprovalsModal({ onClose, adminId }: Props) {
+export default function ApprovalsPage() {
     const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
     const [users, setUsers] = useState<User[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -92,33 +87,34 @@ export function ApprovalsModal({ onClose, adminId }: Props) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="w-full max-w-3xl rounded-xl bg-card p-6 shadow-xl flex flex-col max-h-[90vh]">
-                <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
-                    <div>
-                        <h2 className="text-xl font-semibold text-foreground">Timesheet Approvals</h2>
-                        <p className="text-sm text-muted-foreground mt-1">Review and approve employee submissions.</p>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="rounded p-2 text-muted hover:bg-muted hover:text-foreground transition-colors"
-                    >
-                        <X className="h-5 w-5" />
-                    </button>
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                        Timesheet Approvals
+                    </h1>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Review and approve employee submissions.
+                    </p>
                 </div>
+            </div>
 
-                <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-                    {isLoading ? (
-                        <p className="text-center text-muted-foreground py-8">Loading submissions...</p>
-                    ) : timesheets.length === 0 ? (
-                        <div className="text-center py-12">
-                            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500 mb-3">
-                                <Check className="h-6 w-6" />
-                            </div>
-                            <p className="text-muted-foreground">All caught up! No pending approvals.</p>
+            <div className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-sm min-h-[500px]">
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <p className="text-muted-foreground">Loading submissions...</p>
+                    </div>
+                ) : timesheets.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-500/10 text-primary-500 mb-4">
+                            <Check className="h-8 w-8" />
                         </div>
-                    ) : (
-                        timesheets.map(ts => {
+                        <h3 className="text-lg font-medium text-foreground">All caught up!</h3>
+                        <p className="text-muted-foreground mt-1">No pending timesheet approvals at the moment.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {timesheets.map(ts => {
                             const emp = usersById[ts.employeeId];
                             const empName = emp ? emp.name : `Employee #${ts.employeeId}`;
                             const isRejecting = rejectingId === ts.id;
@@ -152,13 +148,13 @@ export function ApprovalsModal({ onClose, adminId }: Props) {
                                         </div>
 
                                         {isRejecting ? (
-                                            <div className="flex items-center gap-2 w-full sm:w-auto mt-3 sm:mt-0">
+                                            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto mt-3 sm:mt-0">
                                                 <input
                                                     type="text"
                                                     placeholder="Reason for rejection..."
                                                     value={comment}
                                                     onChange={(e) => setComment(e.target.value)}
-                                                    className="flex-1 sm:w-64 rounded-md border border-border px-3 py-1.5 text-sm outline-none focus:border-red-500"
+                                                    className="flex-1 sm:w-64 rounded-md border border-border px-3 py-1.5 text-sm outline-none focus:border-red-500 bg-background"
                                                     autoFocus
                                                 />
                                                 <button
@@ -171,7 +167,7 @@ export function ApprovalsModal({ onClose, adminId }: Props) {
                                                 <button
                                                     onClick={() => setRejectingId(null)}
                                                     disabled={isProcessing}
-                                                    className="px-3 py-1.5 border border-border text-foreground text-xs font-semibold rounded-md hover:bg-muted disabled:opacity-50"
+                                                    className="px-3 py-1.5 border border-border bg-background text-foreground text-xs font-semibold rounded-md hover:bg-muted disabled:opacity-50"
                                                 >
                                                     Cancel
                                                 </button>
@@ -216,11 +212,11 @@ export function ApprovalsModal({ onClose, adminId }: Props) {
                                                         const pName = projectsById[task.projectId]?.name || "Unassigned Project";
                                                         return (
                                                             <div key={task.id} className="grid grid-cols-12 gap-4 pb-2 border-b border-border text-xs rounded-lg p-2 bg-muted/30">
-                                                                <div className="col-span-2 font-medium text-foreground">{task.date}</div>
-                                                                <div className="col-span-3 text-muted-foreground truncate" title={pName}>{pName}</div>
-                                                                <div className="col-span-4 font-medium text-foreground truncate" title={task.name}>{task.name}</div>
-                                                                <div className="col-span-2 text-primary-500 font-semibold">{task.workedHours} hrs</div>
-                                                                <div className="col-span-1">
+                                                                <div className="col-span-12 sm:col-span-2 font-medium text-foreground">{task.date}</div>
+                                                                <div className="col-span-12 sm:col-span-3 text-muted-foreground truncate" title={pName}>{pName}</div>
+                                                                <div className="col-span-12 sm:col-span-4 font-medium text-foreground truncate" title={task.name}>{task.name}</div>
+                                                                <div className="col-span-6 sm:col-span-2 text-primary-500 font-semibold">{task.workedHours} hrs</div>
+                                                                <div className="col-span-6 sm:col-span-1">
                                                                     <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium uppercase ${task.billingType === 'billable' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-orange-500/10 text-orange-600'
                                                                         }`}>
                                                                         {task.billingType === 'billable' ? '$' : '-'}
@@ -240,9 +236,9 @@ export function ApprovalsModal({ onClose, adminId }: Props) {
                                     )}
                                 </div>
                             );
-                        })
-                    )}
-                </div>
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -12,6 +12,7 @@ import {
   Settings,
   User as UserIcon,
   Clock,
+  CheckSquare,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { logoutAction } from "@/app/actions";
@@ -19,6 +20,7 @@ import { useUser } from "@/components/UserProvider";
 
 const adminLinks = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/approvals", label: "Approvals", icon: CheckSquare },
   { href: "/admin/timesheet", label: "Timesheet", icon: Clock4 },
   { href: "/admin/employees", label: "Employees", icon: Users },
   { href: "/admin/clients", label: "Clients", icon: Briefcase },
