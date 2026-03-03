@@ -88,7 +88,7 @@ export default function TrashDashboard() {
                 trashItems.map((item) => {
                   const data = item.entityData;
                   const identifier = data.name || data.code || (data.firstName ? `${data.firstName} ${data.lastName}` : "Unknown");
-                  const deletedDate = parseISO(item.createdAt);
+                  const deletedDate = new Date(item.createdAt);
                   const daysLeft = 30 - differenceInDays(new Date(), deletedDate);
 
                   return (
