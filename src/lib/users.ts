@@ -23,6 +23,7 @@ export type Employee = {
   password: string;
   role: Role;
   department: string;
+  departmentId?: number;
   location: string;
   shift: "day" | "evening" | "night";
 

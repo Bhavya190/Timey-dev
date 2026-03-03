@@ -9,6 +9,7 @@ import {
   IdentificationBadge,
   CurrencyDollar,
 } from "@phosphor-icons/react";
+import DepartmentDropdown from "./DepartmentDropdown";
 
 type Mode = "add" | "edit";
 
@@ -54,6 +55,7 @@ export default function AddEmployeeModal({
     "employee"
   );
   const [department, setDepartment] = useState("Default Department");
+  const [departmentId, setDepartmentId] = useState<number | undefined>();
   const [location, setLocation] = useState("Office");
   const [shift, setShift] = useState<"day" | "evening" | "night">("day");
 
@@ -98,6 +100,7 @@ export default function AddEmployeeModal({
       setLastName(employee.lastName);
       setRole((employee.role as any) || "employee");
       setDepartment(employee.department);
+      setDepartmentId(employee.departmentId);
       setLocation(employee.location);
       setShift((employee.shift as any) || "day");
       setAddress(employee.address || "");
@@ -127,6 +130,7 @@ export default function AddEmployeeModal({
       setPassword("");
       setRole("employee");
       setDepartment("Default Department");
+      setDepartmentId(undefined);
       setLocation("Office");
       setShift("day"); // default shift
       setAddress("");
@@ -206,6 +210,7 @@ export default function AddEmployeeModal({
       billingStart,
       billingEnd,
       code,
+      departmentId,
     };
 
     onSave(fullEmployeeData);
@@ -375,11 +380,12 @@ export default function AddEmployeeModal({
                   <label className="text-xs font-medium text-foreground">
                     Department<span className="text-red-500">*</span>
                   </label>
-                  <input
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40"
-                    required
+                  <DepartmentDropdown
+                    selectedId={departmentId}
+                    onSelect={(dept) => {
+                      setDepartmentId(dept.id);
+                      setDepartment(dept.name);
+                    }}
                   />
                 </div>
 

@@ -12,7 +12,7 @@ export type EmployeeStatus = 'Active' | 'Inactive';
 
 export interface Employee {
     id: number;
-    name?: string; // Optional: Often computed or only in certain views
+    name?: string;
     code: string;
     email: string;
     firstName: string;
@@ -20,9 +20,10 @@ export interface Employee {
     lastName: string;
     password: string;
     role: Role;
-    department: string;
+    department: string; // Keep for backward compatibility/display
+    departmentId?: number; // New link
     location: string;
-    status?: EmployeeStatus; // Optional: Missing in lib/users.ts but present in lib/employees.ts
+    status?: EmployeeStatus;
     shift: "day" | "evening" | "night";
     address: string;
     city: string;
@@ -44,6 +45,15 @@ export interface Employee {
     emailNotifications?: boolean;
     weeklyReport?: boolean;
     securityAlerts?: boolean;
+}
+
+export interface Department {
+    id: number;
+    name: string;
+    description?: string;
+    employeeCount?: number; // Computed field for list view
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type EmployeeProfile = Employee;

@@ -24,6 +24,7 @@ const adminLinks = [
   { href: "/admin/approvals", label: "Approvals", icon: CheckSquare },
   { href: "/admin/timesheet", label: "Timesheet", icon: Clock4 },
   { href: "/admin/employees", label: "Employees", icon: Users },
+  { href: "/admin/departments", label: "Departments", icon: Briefcase },
   { href: "/admin/clients", label: "Clients", icon: Briefcase },
   { href: "/admin/projects", label: "Projects", icon: FolderKanban },
   { href: "/admin/tasks", label: "Tasks", icon: ClipboardList },

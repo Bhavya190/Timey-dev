@@ -51,6 +51,28 @@ async function main() {
                 );
                 `);
             }
+            // Check for Department table
+            const checkDepartment = await pool.query(`
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name = 'Department'
+                );
+            `);
+
+            if (!checkDepartment.rows[0].exists) {
+                console.log("Creating Department table...");
+                await pool.query(`
+                CREATE TABLE "Department" (
+                    "id" SERIAL PRIMARY KEY,
+                    "name" TEXT NOT NULL UNIQUE,
+                    "description" TEXT,
+                    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                `);
+            }
+
             console.log("Database tables already exist. Running schema migration for missing columns...");
             const missingColumns = [
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "middleName" TEXT;`,
@@ -58,6 +80,7 @@ async function main() {
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "emailNotifications" BOOLEAN DEFAULT false;`,
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "weeklyReport" BOOLEAN DEFAULT false;`,
                 `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "securityAlerts" BOOLEAN DEFAULT false;`,
+                `ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "departmentId" INTEGER REFERENCES "Department"("id") ON DELETE SET NULL ON UPDATE CASCADE;`,
                 `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "address" TEXT;`,
                 `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "city" TEXT;`,
                 `ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "stateRegion" TEXT;`,

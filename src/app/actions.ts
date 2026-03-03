@@ -13,7 +13,8 @@ import type {
     Project,
     Task,
     Timesheet,
-    Notification
+    Notification,
+    Department
 } from "@/types";
 
 import {
@@ -57,6 +58,13 @@ import {
     restoreFromTrash,
     hardDeleteTrash,
 } from "@/lib/trash";
+import {
+    getDepartments,
+    getDepartmentById,
+    createDepartment,
+    updateDepartment,
+    deleteDepartment
+} from "@/lib/departments";
 
 // Re-export types for convenience
 export type { User, Employee, EmployeeProfile, Client, Project, Task, Timesheet };
@@ -91,6 +99,14 @@ export async function fetchEmployeeAction(id: number): Promise<Employee | null> 
     const found = employees.find(e => e.id == id) || null;
     console.log(`fetchEmployeeAction found: ${found ? found.firstName + ' ' + found.lastName : 'null'}`);
     return found;
+}
+
+// Queries - Departments
+export async function fetchDepartmentsAction(): Promise<Department[]> {
+    return await getDepartments();
+}
+export async function fetchDepartmentByIdAction(id: number): Promise<Department | null> {
+    return await getDepartmentById(id);
 }
 
 // Mutations - Clients
@@ -141,6 +157,38 @@ export async function deleteProjectAction(id: number) {
         if (user) await moveToTrash(user.id, "Project", id, proj);
     }
     return await deleteProject(id);
+}
+
+// Mutations - Departments
+export async function createDepartmentAction(data: { name: string; description?: string }) {
+    try {
+        const result = await createDepartment(data);
+        revalidatePath("/admin/departments");
+        return result;
+    } catch (err: any) {
+        console.error("createDepartmentAction error:", err);
+        return { error: err.message || "Failed to create department" };
+    }
+}
+export async function updateDepartmentAction(id: number, data: { name: string; description?: string }) {
+    try {
+        const result = await updateDepartment(id, data);
+        revalidatePath("/admin/departments");
+        return result;
+    } catch (err: any) {
+        console.error("updateDepartmentAction error:", err);
+        return { error: err.message || "Failed to update department" };
+    }
+}
+export async function deleteDepartmentAction(id: number) {
+    try {
+        await deleteDepartment(id);
+        revalidatePath("/admin/departments");
+        return { success: true };
+    } catch (err: any) {
+        console.error("deleteDepartmentAction error:", err);
+        return { error: err.message || "Failed to delete department" };
+    }
 }
 
 // Mutations - Tasks

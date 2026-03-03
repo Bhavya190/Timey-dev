@@ -10,6 +10,7 @@ export type Employee = {
   lastName: string;
   email: string;
   department: string;
+  departmentId?: number;
   location: string;
   code: string;
   status: EmployeeStatus;
@@ -44,6 +45,7 @@ export async function getAdminEmployees(): Promise<Employee[]> {
     lastName: emp.lastName,
     email: emp.email,
     department: emp.department,
+    departmentId: emp.departmentId,
     location: emp.location,
     code: emp.code,
     status: 'Active' as const,
