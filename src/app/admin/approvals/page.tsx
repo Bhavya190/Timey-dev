@@ -132,7 +132,7 @@ export default function ApprovalsPage() {
                             );
 
                             return (
-                                <div key={ts.id} className="rounded-lg border border-border bg-background/50 hover:bg-background transition-colors overflow-hidden">
+                                <div key={ts.id} className="rounded-lg border border-border bg-background/50 hover:bg-background transition-colors overflow-x-auto">
                                     <div className="p-4 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                                         <div className="flex items-center gap-4">
                                             <div className="h-10 w-10 shrink-0 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-500 font-bold uppercase">
